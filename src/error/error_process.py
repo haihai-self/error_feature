@@ -2,8 +2,8 @@ import pandas as pd
 import matplotlib as plot
 
 
-def densPlot(df, loc):
-    df = df.drop(columns='untrained')
+def densPlot(df, loc, label_loc):
+    df = df.drop(columns=['untrained_acc', 'classify'])
     df_plot = df.rename(columns={'mue_ED0': r'$\mu_E$', 'var_ED0': r'$\sigma_E$', 'mue_ED': r'$\mu_{ED}$', 'NMED': r'$NMED$',
                        'var_ED': r'$\sigma_{ED}$', 'mue_RED': r'$\mu_{RE}$', 'var_RED': r'$\sigma_{RE}$',
                        'mue_ARED': r'$\mu_{RED}$', 'var_ARED': r'$\sigma_{RED}$', 'RMS_ED': r'$rms_E$ ',
@@ -11,7 +11,7 @@ def densPlot(df, loc):
                        })
     # 绘制密度图像
     ax = df_plot.plot.kde()
-    ax.legend(loc='upper right', ncol=3, fontsize=10)
+    ax.legend(loc=label_loc, ncol=3, fontsize=10)
     fig = ax.get_figure()
     fig.show()
     fig.savefig(loc, bbox_inches='tight')
@@ -25,6 +25,8 @@ if __name__ == '__main__':
     df = df.sample(frac=1.0)  # 全部打乱
     cut_idx = int(round(0.25 * df.shape[0]))
     df_test, df_train = df.iloc[:cut_idx], df.iloc[cut_idx:]
+    df_train = pd.read_csv('./source/train_data.csv')
+    df_test = pd.read_csv('./source/test_data.csv')
 
     # 得到训练集参数 用于归一化
     des = df_train.describe(percentiles=[0.5, 0.6, 0.7, 0.71, 0.72, 0.73, 0.74])
@@ -49,6 +51,6 @@ if __name__ == '__main__':
     # 保存
     df_train_set_max.to_csv('./source/train_norm.csv')
     df_test.to_csv('./source/test_norm.csv')
-    densPlot(df_train_set_max, './result/density_setmax.pdf')
-    densPlot(df_train_not_max, './result/density_nomax.pdf')
+    densPlot(df_train_set_max, './result/density_setmax.pdf', 'upper left')
+    densPlot(df_train_not_max, './result/density_nomax.pdf', 'upper right')
 
