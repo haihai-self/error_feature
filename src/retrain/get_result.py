@@ -4,18 +4,19 @@ import os
 import pandas as pd
 
 
+application = 'resnet18_mnist_origin_app'
 def getFinalAcc():
     result_dir = '../../result/retrain'
-    application = 'vgg16_cifar10_origin_app'
     application_dir = result_dir + '/' + application
     mul_generations = os.listdir(application_dir)
     tested = set()
-    with open('result_analyze/final_acc.log', 'r') as f:
-        for line in f.readlines():
-            if line != '\n':
-                name = line.strip().split()[0]
-                tested.add(name)
-    with open('result_analyze/final_acc.log', 'a+') as f:
+    if os.path.isfile('result_analyze/' + application + '.log'):
+        with open('result_analyze/' + application + '.log', 'r') as f:
+            for line in f.readlines():
+                if line != '\n':
+                    name = line.strip().split()[0]
+                    tested.add(name)
+    with open('result_analyze/' + application + '.log', 'a+') as f:
         for mul_generation in mul_generations:
             mul_generation_dir = application_dir + '/' + mul_generation
             mul_names = os.listdir(mul_generation_dir)
@@ -24,16 +25,20 @@ def getFinalAcc():
                 if mul_name in tested:
                     continue
                 if os.path.isfile(mul_dir + '/acc.log'):
-                    with open(mul_dir + '/acc.log') as acc:
+                    with open(mul_dir + '/acc.log', 'r') as acc:
                         acc_retrain = acc.readline()
+                        if len(acc_retrain) < 3:
+                            os.remove(mul_dir + '/acc.log')
+                            continue
                         acc_inf = -1
+                        f.write(mul_name + ' retrain ' + str(acc_retrain) + ' without_retrain ' + str(acc_inf) + '\n')
                         print(acc_retrain)
 
 
 def getResult():
     err_name = ["mul_name"]
     err_list = []
-    with open('../error/err.txt', 'r') as f:
+    with open('../error/source/err.txt', 'r') as f:
         err_feature = f.readlines()
         for i in range(0, len(err_feature), 2):
             mul_name = err_feature[i].strip()
@@ -62,7 +67,7 @@ def getResult():
     res.insert(0, "untrained", -1.0)
     res.insert(0, "trained", -1.0)
 
-    with open('result_analyze/final_acc.log', 'r') as f:
+    with open('result_analyze/' + application + '.log', 'r') as f:
         lines = f.readlines()
         for line in lines:
             line = line.strip().split()
@@ -70,7 +75,7 @@ def getResult():
                 continue
 
             name = line[0].split(".")[0]
-            trained_acc = float(line[4])
+            trained_acc = float(line[5])
             untrained_acc = float(line[-1])
             res.loc[name, "trained"] = trained_acc
             res.loc[name, "untrained"] = untrained_acc
@@ -82,3 +87,4 @@ def getResult():
 if __name__ == '__main__':
     getFinalAcc()
     getResult()
+

@@ -3,6 +3,7 @@ import matplotlib as plot
 
 
 def densPlot(df, loc):
+    df = df.drop(columns='untrained')
     df_plot = df.rename(columns={'mue_ED0': r'$\mu_E$', 'var_ED0': r'$\sigma_E$', 'mue_ED': r'$\mu_{ED}$', 'NMED': r'$NMED$',
                        'var_ED': r'$\sigma_{ED}$', 'mue_RED': r'$\mu_{RE}$', 'var_RED': r'$\sigma_{RE}$',
                        'mue_ARED': r'$\mu_{RED}$', 'var_ARED': r'$\sigma_{RED}$', 'RMS_ED': r'$rms_E$ ',
@@ -16,8 +17,9 @@ def densPlot(df, loc):
     fig.savefig(loc, bbox_inches='tight')
 
 if __name__ == '__main__':
-    df = pd.read_csv("err.csv", index_col='mul_name')
-    df.drop_duplicates(keep='first', inplace=True)  # 去重
+    df = pd.read_csv("source/err.csv", index_col='mul_name')
+    df_acc = pd.read_csv('source/untrained_acc.csv', index_col='mul_name')
+    df = pd.merge(df, df_acc, on='mul_name')
 
     # 分割训练集测试集
     df = df.sample(frac=1.0)  # 全部打乱
@@ -29,7 +31,7 @@ if __name__ == '__main__':
     df_train_set_max = df_train.copy()
     df_train_not_max = df_train.copy()
     for index, data in df.iteritems():
-        if index == 'single-sided' or index == 'zero-error':
+        if index == 'single-sided' or index == 'zero-error' or index == 'untrained':
             continue
         # 设置训练集
         df_train_set_max.loc[df_train_set_max.loc[:, index] >= des.loc['73%', index], index] = des.loc['73%', index]
@@ -45,9 +47,8 @@ if __name__ == '__main__':
                 des.loc['73%', index] - des.loc['min', index])
 
     # 保存
-    df_train.to_csv('./train_norm.csv')
-    df_test.to_csv('./test_norm.csv')
-
+    df_train_set_max.to_csv('./source/train_norm.csv')
+    df_test.to_csv('./source/test_norm.csv')
     densPlot(df_train_set_max, './result/density_setmax.pdf')
     densPlot(df_train_not_max, './result/density_nomax.pdf')
 
