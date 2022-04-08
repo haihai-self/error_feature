@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     # 保存
     df_train.to_csv('./train_norm.csv')
-    df_train.to_csv('./train_norm.csv')
+    df_test.to_csv('./test_norm.csv')
 
     densPlot(df_train_set_max, './result/density_setmax.pdf')
     densPlot(df_train_not_max, './result/density_nomax.pdf')
