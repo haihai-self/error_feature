@@ -1,7 +1,7 @@
 from sklearn import svm
 import pandas as pd
 import numpy as np
-from multiprocessing import Pool
+
 
 
 def classifySVM(df, feature_index):
