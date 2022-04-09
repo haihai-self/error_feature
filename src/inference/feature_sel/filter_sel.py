@@ -153,6 +153,10 @@ def cartPlot(df, loc, label_loc, label):
     plt.savefig(loc, bbox_inches='tight')
     plt.show()
 
+    for index, data in df_plot.iteritems():
+        df_plot.sort_values(by=index, inplace=True, ascending=False)
+        print(df_plot.index)
+
 
 if __name__ == '__main__':
     df = pd.read_csv('../../error/source/train_norm.csv')
@@ -168,10 +172,15 @@ if __name__ == '__main__':
 
 
     df_sel_d = pd.DataFrame([var,chi2, c_mrmr], index=index_c)
-    saving_loc = '../result/temp.pdf'
+    saving_loc = '../result/filter_c.pdf'
     legend_loc = 'center left'
     cartPlot(df_sel_d, saving_loc, legend_loc, label=index_c)
 
+
+    dd_mrmr, dq_mrmr = classifyMrmrSel(df)
     index_d = [r'$Dd_{mrmr}$', r'$Dq_{mrmr}$']
-    # dd_mrmr, dq_mrmr = classifyMrmrSel(df)
+    df_sel_d = pd.DataFrame([dd_mrmr,dq_mrmr], index=index_d)
+    saving_loc = '../result/filter_d.pdf'
+    legend_loc = 'center left'
+    cartPlot(df_sel_d, saving_loc, legend_loc, label=index_d)
 
