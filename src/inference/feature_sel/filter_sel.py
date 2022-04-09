@@ -133,7 +133,7 @@ def classifyMrmrSel(df):
     return se_d, se_q
 
 
-def cartPlot(df, loc, label_loc, label):
+def cartPlot(df, loc, label_loc, label, tittle):
     df_plot = df.rename(columns={'mue_ED0': r'$\mu_E$', 'var_ED0': r'$\sigma_E$', 'mue_ED': r'$\mu_{ED}$', 'NMED': r'$NMED$',
                        'var_ED': r'$\sigma_{ED}$', 'mue_RED': r'$\mu_{RE}$', 'var_RED': r'$\sigma_{RE}$',
                        'mue_ARED': r'$\mu_{RED}$', 'var_ARED': r'$\sigma_{RED}$', 'RMS_ED': r'$rms_E$ ',
@@ -146,12 +146,13 @@ def cartPlot(df, loc, label_loc, label):
         data = (data - data.min()) / (data.max() - data.min())
         plt.plot(df_plot.index, data, label=index)
 
-    plt.rcParams['font.serif'] = ['Times New Roman']
-    plt.title('continues feature importance')
+    # plt.rcParams['font.serif'] = ['Times New Roman']
+    plt.title(tittle)
     plt.yticks([x/10 for x in range(0, 12, 2)])
     plt.legend(loc=label_loc, fontsize=10)
     plt.savefig(loc, bbox_inches='tight')
     plt.show()
+    plt.close()
 
     for index, data in df_plot.iteritems():
         df_plot.sort_values(by=index, inplace=True, ascending=False)
@@ -173,14 +174,14 @@ if __name__ == '__main__':
 
     df_sel_d = pd.DataFrame([var,chi2, c_mrmr], index=index_c)
     saving_loc = '../result/filter_c.pdf'
-    legend_loc = 'center left'
-    cartPlot(df_sel_d, saving_loc, legend_loc, label=index_c)
+    legend_loc = 'upper right'
+    cartPlot(df_sel_d, saving_loc, legend_loc, label=index_c, tittle='continues feature importance')
 
 
     dd_mrmr, dq_mrmr = classifyMrmrSel(df)
     index_d = [r'$Dd_{mrmr}$', r'$Dq_{mrmr}$']
     df_sel_d = pd.DataFrame([dd_mrmr,dq_mrmr], index=index_d)
     saving_loc = '../result/filter_d.pdf'
-    legend_loc = 'center left'
-    cartPlot(df_sel_d, saving_loc, legend_loc, label=index_d)
+    legend_loc = 'upper right'
+    cartPlot(df_sel_d, saving_loc, legend_loc, label=index_d, tittle='discrete feature importance')
 
