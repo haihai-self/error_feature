@@ -16,7 +16,7 @@ def regressionDecisionTree(df, feature_index):
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_index]
 
-    tree_model = tree.DecisionTreeRegressor(criterion='gini')
+    tree_model = tree.DecisionTreeRegressor()
     tree_model.fit(x, y)
 
     return tree_model
@@ -31,3 +31,4 @@ if __name__ == '__main__':
     feature_index = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED', 'mue_ARED', 'var_ARED',
                      'RMS_ED', 'RMS_RED', 'ER', 'WCE', 'WCRE', 'single-sided', 'zero-error']
     classifyDecisionTree(df, feature_index)
+    regressionDecisionTree(df, feature_index)
