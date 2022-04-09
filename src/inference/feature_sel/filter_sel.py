@@ -3,11 +3,20 @@ from sklearn import metrics
 import numpy as np
 import pandas as pd
 # import pymrmr
+import matplotlib.pyplot as plt
+plt.style.use(['science'])
+
+
+
 
 
 def varSel(df, ):
-    des = df.describe().T.rename(columns={'std': 'std_var'})
-    var = des.loc[:, 'std_var'].sort_values(ascending=False)
+    sel_feature = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED',
+            'mue_ARED', 'var_ARED', 'RMS_ED', 'RMS_RED', 'ER', 'WCE', 'WCRE']
+    feature_var = []
+    for index in sel_feature:
+        feature_var.append(df.loc[:, index].var())
+    var = pd.Series(index=sel_feature, data=feature_var)
     return var
 
 
@@ -22,7 +31,6 @@ def chi2Sel(df):
 
     model.fit(data, target)
     score = -np.log(model.pvalues_)
-    print(score)
     se = pd.Series(index= sel_feature,
                    data=score)
     return se
@@ -30,7 +38,7 @@ def chi2Sel(df):
 
 def regressionMrmrSel(df):
     sel_feature = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED',
-                   'mue_ARED', 'var_ARED', 'RMS_ED', 'RMS_RED', 'ER', 'WCE', 'WCRE', 'single-sided', 'zero-error']
+                   'mue_ARED', 'var_ARED', 'RMS_ED', 'RMS_RED', 'ER', 'WCE', 'WCRE']
     d = df.loc[:, sel_feature].astype(float)
     f = df.loc[:, 'untrained_acc']
 
@@ -52,7 +60,7 @@ def regressionMrmrSel(df):
         mi_x.append(temp.sum() / input.shape[1])
     # 计算phi得分
     score = mi_y - mi_x
-    se = pd.Series(index=sel_feature, data=score)
+    se = pd.Series(index=sel_feature, data=score).rename_axis(r'$C_{mrmr}$')
     # idxs = sorted(range(len(score)), key=lambda k: score[k], reverse=True)  # 得到与之对应的idx
     # score = sorted(score, reverse=True)  # 互信息排序
     return se
@@ -103,7 +111,7 @@ def classifyMrmrSel(df):
         mi_x.append(temp.sum() / input.shape[1])
     # 计算phi得分
     score = mi_y - mi_x
-    se_d = pd.Series(index=sel_feature, data=score)
+    se_d = pd.Series(index=sel_feature, data=score).rename_axis(r'$Dd_{mrmr}$')
 
 
     # 计算q_cut
@@ -119,12 +127,31 @@ def classifyMrmrSel(df):
         mi_x.append(temp.sum() / input.shape[1])
     # 计算phi得分
     score = mi_y - mi_x
-    se_q = pd.Series(index=sel_feature, data=score)
+    se_q = pd.Series(index=sel_feature, data=score).rename_axis(r'$Dq_{mrmr}$')
 
 
     return se_d, se_q
 
 
+def cartPlot(df, loc, label_loc, label):
+    df_plot = df.rename(columns={'mue_ED0': r'$\mu_E$', 'var_ED0': r'$\sigma_E$', 'mue_ED': r'$\mu_{ED}$', 'NMED': r'$NMED$',
+                       'var_ED': r'$\sigma_{ED}$', 'mue_RED': r'$\mu_{RE}$', 'var_RED': r'$\sigma_{RE}$',
+                       'mue_ARED': r'$\mu_{RED}$', 'var_ARED': r'$\sigma_{RED}$', 'RMS_ED': r'$rms_E$ ',
+                       'RMS_RED': r'$rms_{RE}$', 'ER': r'$ER$', 'WCE': r'$W_E$', 'WCRE': r'$W_{RE}$', 'single-sided':r'$E_{ss}$', 'zero-error':r'$E_{zo}$'
+                       })
+    df_plot = df_plot.T
+    df_plot.sort_values(by=label[1], inplace=True, ascending=False)
+    plt.figure(figsize=(8, 4))
+    for index, data in df_plot.iteritems():
+        data = (data - data.min()) / (data.max() - data.min())
+        plt.plot(df_plot.index, data, label=index)
+
+    plt.rcParams['font.serif'] = ['Times New Roman']
+    plt.title('continues feature importance')
+    plt.yticks([x/10 for x in range(0, 12, 2)])
+    plt.legend(loc=label_loc, fontsize=10)
+    plt.savefig(loc, bbox_inches='tight')
+    plt.show()
 
 
 if __name__ == '__main__':
@@ -134,7 +161,17 @@ if __name__ == '__main__':
     df.loc[df.loc[:, 'zero-error'] == 'NO', 'zero-error'] = 0
     df.loc[df.loc[:, 'zero-error'] == 'YES', 'zero-error'] = 1
 
-    # var = varSel(df)
-    # chi2 = chi2Sel(df)
-    # re_mrmr = regressionMrmrSel(df)
-    classifyMrmrSel(df)
+    var = varSel(df)
+    chi2 = chi2Sel(df)
+    index_c = [r'$\sigma$', r'$\chi^2$', r'$C_{mrmr}$']
+    c_mrmr = re_mrmr = regressionMrmrSel(df)
+
+
+    df_sel_d = pd.DataFrame([var,chi2, c_mrmr], index=index_c)
+    saving_loc = '../result/temp.pdf'
+    legend_loc = 'center left'
+    cartPlot(df_sel_d, saving_loc, legend_loc, label=index_c)
+
+    index_d = [r'$Dd_{mrmr}$', r'$Dq_{mrmr}$']
+    # dd_mrmr, dq_mrmr = classifyMrmrSel(df)
+
