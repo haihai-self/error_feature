@@ -33,6 +33,9 @@ def regressionRF(df, feature_index):
     return model
 
 
+
+    
+
 if __name__ == '__main__':
     df = pd.read_csv('../../error/source/train_norm.csv')
     df.loc[df.loc[:, 'single-sided'] == 'NO', 'single-sided'] = 0
@@ -44,3 +47,4 @@ if __name__ == '__main__':
 
     classifyRF(df, feature_index)
     regressionRF(df, feature_index)
+
