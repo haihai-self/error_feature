@@ -10,7 +10,7 @@ from models import predict_model
 def classifyRF(df, feature_index):
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
-    param = {'n_estimators': range(10, 400, 10)}
+    param = {'n_estimators': range(60, 400, 20)}
     gsearch = GridSearchCV(estimator=RandomForestClassifier(n_estimators=60, oob_score=True, random_state=10)
                            , param_grid=param, cv=5, n_jobs=-1, scoring=score())
     gsearch.fit(x.values, y)

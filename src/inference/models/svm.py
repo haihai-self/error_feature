@@ -9,7 +9,7 @@ def classifySVM(df, feature_index):
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
 
-    param = {'C': range(1, 10, 1),
+    param = {'C': range(1, 10, 2),
              'kernel': ['poly', 'rbf', 'sigmoid']}
     gsearch = GridSearchCV(estimator=svm.SVC(C=10, kernel='poly')
                            , param_grid=param, cv=5, n_jobs=-1, scoring=classify.score())

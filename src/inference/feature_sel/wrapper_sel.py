@@ -1,10 +1,12 @@
 import pandas as pd
 import random
 import sys
+
 sys.path.append('..')
 from models import svm, dt, rf, predict_model
 from evaluate import classify
 import numpy as np
+
 
 def evaluationModel(df_train, feature_index, model, model_name):
     df_test = pd.read_csv('../../error/source/test_norm.csv')
@@ -19,6 +21,7 @@ def evaluationModel(df_train, feature_index, model, model_name):
 
     return result
 
+
 def lvm(df, func, model_name):
     e = [0]
     feature_index = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED', 'mue_ARED', 'var_ARED',
@@ -32,14 +35,16 @@ def lvm(df, func, model_name):
         a_cur = random.sample(feature_index, d_cur)
         model = func(df, a_cur)
         e_cur = evaluationModel(df, a_cur, model, model_name)
+        print(t)
         if e_cur[-1] > e[-1] or (e_cur[-1] == e[-1] and d_cur < d):
             t = 0
             e = e_cur
             d = d_cur
             a = a_cur
         else:
-            t+=1
+            t += 1
     return a, e
+
 
 if __name__ == '__main__':
     df = pd.read_csv('../../error/source/train_norm.csv')
@@ -48,7 +53,8 @@ if __name__ == '__main__':
     df.loc[df.loc[:, 'zero-error'] == 'NO', 'zero-error'] = 0
     df.loc[df.loc[:, 'zero-error'] == 'YES', 'zero-error'] = 1
     # func_dict = {'dt': dt.classifyDecisionTree, 'svm':svm.classifySVM, 'rf': rf.classifyRF}
-    func_dict = {'dt': dt.classifyDecisionTree, 'svm':svm.classifySVM}
+    func_dict = {'dt': dt.classifyDecisionTree, 'svm': svm.classifySVM}
+    # func_dict = {'rf': rf.classifyRF}
 
     for key in func_dict:
         feature = lvm(df, func_dict[key], key)
