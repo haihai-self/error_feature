@@ -2,7 +2,7 @@ from sklearn import metrics
 import numpy as np
 import pandas as pd
 
-def predictClassify(model, feature_index):
+def predictClassify(model, feature_index, model_name):
     # 读取测试文件
     df = pd.read_csv('../../error/source/test_norm.csv')
     df.loc[df.loc[:, 'single-sided'] == 'NO', 'single-sided'] = 0
@@ -13,8 +13,11 @@ def predictClassify(model, feature_index):
     y = df.loc[:, 'classify']
 
     # 计算前两类预测值
-    x = model._validate_X_predict(x, True)
-    proba = model.tree_.predict(x)
+    # x = model._validate_X_predict(x, True)
+    if model_name == 'svm':
+        proba = model.decision_function(x)
+    else:
+        proba = model.predict_proba(x)
     top1 = np.argmax(proba, axis=1)
     for i in range(len(proba)):
         proba[i][top1[i]] = -1

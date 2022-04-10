@@ -1,9 +1,8 @@
 from sklearn import tree
 import pandas as pd
-from predict_model import predictClassify
+from models.predict_model import predictClassify
 import sys
 sys.path.append('..')
-print(sys.path)
 from evaluate.classify import evaluation
 
 def classifyDecisionTree(df, feature_index):
