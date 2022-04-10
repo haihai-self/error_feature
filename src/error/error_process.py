@@ -1,5 +1,6 @@
 import pandas as pd
-import matplotlib as plot
+import matplotlib.pyplot as plt
+plt.style.use(['science', 'ieee'])
 
 
 def densPlot(df, loc, label_loc):
