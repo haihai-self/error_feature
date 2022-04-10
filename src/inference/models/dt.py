@@ -1,6 +1,10 @@
 from sklearn import tree
 import pandas as pd
-
+from predict_model import predictClassify
+import sys
+sys.path.append('..')
+print(sys.path)
+from evaluate.classify import evaluation
 
 def classifyDecisionTree(df, feature_index):
     y = df.loc[:, 'classify']
@@ -8,6 +12,8 @@ def classifyDecisionTree(df, feature_index):
 
     tree_model = tree.DecisionTreeClassifier(criterion='gini')
     tree_model.fit(x, y)
+
+
 
     return tree_model
 
@@ -30,5 +36,10 @@ if __name__ == '__main__':
     df.loc[df.loc[:, 'zero-error'] == 'YES', 'zero-error'] = 1
     feature_index = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED', 'mue_ARED', 'var_ARED',
                      'RMS_ED', 'RMS_RED', 'ER', 'WCE', 'WCRE', 'single-sided', 'zero-error']
-    classifyDecisionTree(df, feature_index)
-    regressionDecisionTree(df, feature_index)
+    classify_model = classifyDecisionTree(df, feature_index)
+    regression_model = regressionDecisionTree(df, feature_index)
+
+    y, y_pre = predictClassify(classify_model, feature_index)
+    print(evaluation(y, y_pre))
+
+
