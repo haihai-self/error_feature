@@ -53,8 +53,8 @@ if __name__ == '__main__':
     df.loc[df.loc[:, 'zero-error'] == 'NO', 'zero-error'] = 0
     df.loc[df.loc[:, 'zero-error'] == 'YES', 'zero-error'] = 1
     # func_dict = {'dt': dt.classifyDecisionTree, 'svm':svm.classifySVM, 'rf': rf.classifyRF}
-    func_dict = {'dt': dt.classifyDecisionTree, 'svm': svm.classifySVM}
-    # func_dict = {'rf': rf.classifyRF}
+    # func_dict = {'dt': dt.classifyDecisionTree, 'svm': svm.classifySVM}
+    func_dict = {'rf': rf.classifyRF}
 
     for key in func_dict:
         feature = lvm(df, func_dict[key], key)

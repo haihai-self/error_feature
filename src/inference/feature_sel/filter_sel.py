@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 # import pymrmr
 import matplotlib.pyplot as plt
-plt.style.use(['science'])
+plt.style.use(['science', 'ieee'])
 
 
 
