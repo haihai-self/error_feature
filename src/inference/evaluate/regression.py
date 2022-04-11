@@ -8,8 +8,10 @@ def evaluation(y, y_pre):
 
     return acc, r2
 
-def mepa_score(y, y_pre):
+
+def mape_score(y, y_pre):
     return metrics.mean_absolute_percentage_error(y, y_pre)
 
+
 def score():
-    return metrics.make_scorer(mepa_score, greater_is_better=False)
+    return metrics.make_scorer(mape_score, greater_is_better=False)

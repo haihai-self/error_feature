@@ -72,7 +72,7 @@ def lvmRegression(df, func):
         a_cur = random.sample(feature_index, d_cur)
         model = func(df, a_cur)
         e_cur = evaluationModelRegression(a_cur, model)
-        print(t)
+        print(t, e_cur)
         if e_cur[0] < e[0] or (e_cur[0] == e[0] and d_cur < d):
             t = 0
             e = e_cur
@@ -88,15 +88,15 @@ if __name__ == '__main__':
     df.loc[df.loc[:, 'zero-error'] == 'NO', 'zero-error'] = 0
     df.loc[df.loc[:, 'zero-error'] == 'YES', 'zero-error'] = 1
     # func_dict = {'dt': dt.classifyDecisionTree, 'svm':svm.classifySVM, 'rf': rf.classifyRF}
-    func_dict = {'dt': dt.classifyDecisionTree, 'svm': svm.classifySVM}
+    # func_dict = {'dt': dt.classifyDecisionTree, 'svm': svm.classifySVM}
     # func_dict = {'rf': rf.classifyRF}
 
-    for key in func_dict:
-        feature = lvmClassify(df, func_dict[key], key)
-        print(feature)
+    # for key in func_dict:
+    #     feature = lvmClassify(df, func_dict[key], key)
+    #     print(feature)
 
     func_dict = {'dt': dt.regressionDecisionTree, 'rf':rf.regressionRF, 'svm':svm.regressionSVM}
 
-    # for key in func_dict:
-    #     feature = lvmRegression(df, func_dict[key])
-    #     print(feature)
+    for key in func_dict:
+        feature = lvmRegression(df, func_dict[key])
+        print(feature)

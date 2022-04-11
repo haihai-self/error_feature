@@ -28,10 +28,10 @@ def regressionRF(df, feature_index):
     x = df.loc[:, feature_index]
 
     param = {'n_estimators': range(10, 201, 10)}
-    gsearch = GridSearchCV(estimator=RandomForestRegressor(n_estimators=60, oob_score=True, random_state=10)
+    gsearch = GridSearchCV(estimator=RandomForestRegressor(n_estimators=60, random_state=10)
                            , param_grid=param, cv=5, n_jobs=-1)
     gsearch.fit(x.values, y)
-    # print( gsearch.best_params_, gsearch.best_score_)
+    print(gsearch.best_params_)
     model = gsearch.best_estimator_
     # model = RandomForestClassifier(n_estimators=, oob_score=True, random_state=10)
     model.fit(x, y)
