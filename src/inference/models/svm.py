@@ -9,8 +9,8 @@ def classifySVM(df, feature_index):
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
 
-    param = {'C': [x / 10 for x in range(1, 21, 2)],
-             'kernel': ['poly', 'rbf', 'sigmoid']}
+    param = {'C': [x for x in range(2200, 2401, 25)],
+             'kernel': ['rbf']}
     gsearch = GridSearchCV(estimator=svm.SVC(C=10, kernel='poly')
                            , param_grid=param, cv=5, n_jobs=-1, scoring=classify.score())
     gsearch.fit(x.values, y)
@@ -56,8 +56,8 @@ def regressionSVM(df, feature_index):
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_index]
 
-    param = {
-             'kernel': ['poly', 'rbf', 'sigmoid']}
+    param = {'C': [x for x in range(20, 31, 2)],
+             'kernel': ['rbf']}
     gsearch = GridSearchCV(estimator=svm.SVR(C=5, kernel='poly')
                            , param_grid=param, cv=5, n_jobs=-1, scoring=regression.score())
     gsearch.fit(x.values, y)
@@ -113,3 +113,7 @@ if __name__ == '__main__':
     # df.loc[df.loc[:, 'zero-error'] == 'NO', 'zero-error'] = 0
     # df.loc[df.loc[:, 'zero-error'] == 'YES', 'zero-error'] = 1
     # classifyTest(df, feature_index, classify_model)
+
+
+# (['var_ED', 'ER', 'WCE', 'WCRE', 'mue_RED', 'RMS_ED', 'RMS_RED', 'mue_ARED', 'single-sided', 'mue_ED', 'var_ARED', 'mue_ED0', 'var_RED'], (0.9749877390877881, 0.9906817067189799, 0.9586466165413534, 0.9749877390877881, 0.8504578966063688))
+# (['WCE', 'var_ED', 'NMED', 'var_ARED', 'mue_ARED', 'zero-error', 'mue_ED0', 'WCRE', 'mue_ED', 'RMS_ED', 'single-sided', 'var_RED', 'RMS_RED', 'mue_RED', 'ER', 'var_ED0'], (0.8848729528439084, 0.8520471294395444))
