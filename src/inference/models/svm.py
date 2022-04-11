@@ -56,14 +56,13 @@ def regressionSVM(df, feature_index):
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_index]
 
-    param = {'C': [x / 10 for x in range(1, 21, 2)],
+    param = {
              'kernel': ['poly', 'rbf', 'sigmoid']}
-    gsearch = GridSearchCV(estimator=svm.SVR(C=10, kernel='poly')
+    gsearch = GridSearchCV(estimator=svm.SVR(C=5, kernel='poly')
                            , param_grid=param, cv=5, n_jobs=-1, scoring=regression.score())
     gsearch.fit(x.values, y)
-    C = gsearch.best_params_['C']
     kernel = gsearch.best_params_['kernel']
-    model = svm.SVR(C=C, kernel=kernel)
+    model = svm.SVR(C=5, kernel=kernel)
     model.fit(x, y)
     print(gsearch.best_params_)
     return model

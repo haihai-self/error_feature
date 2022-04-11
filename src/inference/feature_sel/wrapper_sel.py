@@ -81,9 +81,9 @@ if __name__ == '__main__':
     df = processData(df)
     func_dict = {}
     # func_dict['dt'] = dt.classifyDecisionTree
-    # func_dict['svm'] = svm.classifySVM
+    func_dict['svm'] = svm.classifySVM
     # func_dict['rf'] = rf.classifyRF
-    func_dict['mlp'] = mlp.classifyMLP
+    # func_dict['mlp'] = mlp.classifyMLP
 
 
     for key in func_dict:
