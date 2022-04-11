@@ -9,7 +9,7 @@ def classifySVM(df, feature_index):
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
 
-    param = {'C': range(1, 10, 2),
+    param = {'C': [x / 10 for x in range(1, 21, 2)],
              'kernel': ['poly', 'rbf', 'sigmoid']}
     gsearch = GridSearchCV(estimator=svm.SVC(C=10, kernel='poly')
                            , param_grid=param, cv=5, n_jobs=-1, scoring=classify.score())
@@ -56,7 +56,7 @@ def regressionSVM(df, feature_index):
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_index]
 
-    param = {'C': range(1, 10, 1),
+    param = {'C': [x / 10 for x in range(1, 21, 2)],
              'kernel': ['poly', 'rbf', 'sigmoid']}
     gsearch = GridSearchCV(estimator=svm.SVR(C=10, kernel='poly')
                            , param_grid=param, cv=5, n_jobs=-1, scoring=regression.score())
