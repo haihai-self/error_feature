@@ -30,3 +30,29 @@ def macro_tpr(y, y_pre):
 def score():
 
     return metrics.make_scorer(macro_tpr, greater_is_better=True)
+
+def sel_res():
+    res_c = {'chi':[],
+           'var':[],
+           'mrmr_c':[],
+           'mrmr_dd':[],
+           'mrmr_dq':[],
+           'lvm_svm':[],
+           'lvm_dt':[],
+           'lvm_rf':[],
+           'lvm_mlp':[],
+            'dfr':[]
+           }
+
+    res_r = {'chi':[],
+           'var':[],
+           'mrmr_c':[],
+           'mrmr_dd':[],
+           'mrmr_dq':[],
+           'lvm_svm':[],
+           'lvm_dt':[],
+           'lvm_rf':[],
+           'lvm_mlp':[],
+            'dfr':[]
+           }
+    return res_c, res_r
