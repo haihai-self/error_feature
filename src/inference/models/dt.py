@@ -3,7 +3,6 @@ import pandas as pd
 from models.predict_model import predictClassify
 import sys
 sys.path.append('..')
-from evaluate.classify import evaluation
 
 def classifyDecisionTree(df, feature_index):
     y = df.loc[:, 'classify']

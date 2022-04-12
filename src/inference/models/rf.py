@@ -3,11 +3,19 @@ from sklearn.model_selection import GridSearchCV
 import pandas as pd
 import sys
 sys.path.append('..')
-from evaluate.classify import evaluation, score
 from models import predict_model
+from sklearn import metrics
 
+def macro_tpr(y, y_pre):
+    return metrics.recall_score(y, y_pre, average='macro')
+
+
+def score():
+
+    return metrics.make_scorer(macro_tpr, greater_is_better=True)
 
 def classifyRF(df, feature_index):
+
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
     param = {'n_estimators': range(60, 400, 20)}
@@ -52,6 +60,6 @@ if __name__ == '__main__':
 
     model = classifyRF(df, feature_index)
     y, y_pre = predict_model.predictClassify(model, feature_index)
-    print(evaluation(y, y_pre))
+    # print(evaluation(y, y_pre))
     regressionRF(df, feature_index)
 
