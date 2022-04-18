@@ -6,12 +6,15 @@ from evaluate import classify, regression
 from sklearn import metrics
 import matplotlib.pyplot as plt
 import sys
+
 sys.path.append('..')
 from models.predict_model import predictClassify, predictSpecClassify, predictRegression, predictSpectRegression
 from error.data_process import processDataSpec, processData
 from evaluate import classify, regression
 
+
 def classifySVM(df, feature_index):
+    # svm分类模型， 搜素最优参数
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
 
@@ -29,6 +32,7 @@ def classifySVM(df, feature_index):
 
 
 def classifySVMPoly(df, feature_index):
+    # svm poly分类模型
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
 
@@ -39,6 +43,7 @@ def classifySVMPoly(df, feature_index):
 
 
 def classifySVMRbf(df, feature_index):
+    # svm rbf 分类模型
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
 
@@ -49,6 +54,7 @@ def classifySVMRbf(df, feature_index):
 
 
 def classifySVMSifmoid(df, feature_index):
+    # svm sigmoid 分类模型
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
 
@@ -59,6 +65,7 @@ def classifySVMSifmoid(df, feature_index):
 
 
 def regressionSVM(df, feature_index):
+    # svm 回归最优模型， 搜索最优参数
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_index]
 
@@ -73,7 +80,9 @@ def regressionSVM(df, feature_index):
     print(gsearch.best_params_)
     return model
 
+
 def regressionSVMPoly(df, feature_index):
+    # svm poly 回归最优模型
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_index]
 
@@ -84,6 +93,7 @@ def regressionSVMPoly(df, feature_index):
 
 
 def regressionSVMRbf(df, feature_index):
+    # svm rbf 回归最优模型
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_index]
 
@@ -94,6 +104,7 @@ def regressionSVMRbf(df, feature_index):
 
 
 def regressionSVMSigmoid(df, feature_index):
+    # svm sigmoid 回归最优模型
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_index]
 
@@ -101,7 +112,13 @@ def regressionSVMSigmoid(df, feature_index):
     model_sigmoid.fit(x, y)
     return model_sigmoid
 
-def plotDT(df, savename):
+
+def plotSVM(df, savename):
+    """
+    绘制df数据折线图
+    :param df: DataFrame 数据结构，
+    :param savename:保存pdf的文件名
+    """
     plt.style.use(['science', 'ieee'])
     # df = df.sort_values(by='mape', ascending=True)
     df.to_csv('../result/csv/' + savename + '.csv')
@@ -116,6 +133,7 @@ def plotDT(df, savename):
 
 
 def svmClaErrorModel():
+    # 训练svm分类误差模型，并且绘制对应指标图
     df = pd.read_csv('../../error/source/train_norm.csv')
     df = processDataSpec(df)
     # feature_index = ['WCRE', 'WCE', 'mue_ED0']
@@ -141,20 +159,8 @@ def svmClaErrorModel():
             y, y_pre = predictSpecClassify(model, feature_index, 'svm', index)
         res = classify.evaluation(y, y_pre)
         dt_df.loc[index, :] = res
-    plotDT(dt_df, 'cla_svm_model')
+    plotSVM(dt_df, 'cla_svm_model')
+
 
 if __name__ == '__main__':
     svmClaErrorModel()
-
-    # regression_model = regressionSVM(df, feature_index)
-
-    # df = pd.read_csv('../../error/source/test_norm.csv')
-    # df.loc[df.loc[:, 'single-sided'] == 'NO', 'single-sided'] = 0
-    # df.loc[df.loc[:, 'single-sided'] == 'YES', 'single-sided'] = 1
-    # df.loc[df.loc[:, 'zero-error'] == 'NO', 'zero-error'] = 0
-    # df.loc[df.loc[:, 'zero-error'] == 'YES', 'zero-error'] = 1
-    # classifyTest(df, feature_index, classify_model)
-
-
-# (['var_ED', 'ER', 'WCE', 'WCRE', 'mue_RED', 'RMS_ED', 'RMS_RED', 'mue_ARED', 'single-sided', 'mue_ED', 'var_ARED', 'mue_ED0', 'var_RED'], (0.9749877390877881, 0.9906817067189799, 0.9586466165413534, 0.9749877390877881, 0.8504578966063688))
-# (['WCE', 'var_ED', 'NMED', 'var_ARED', 'mue_ARED', 'zero-error', 'mue_ED0', 'WCRE', 'mue_ED', 'RMS_ED', 'single-sided', 'var_RED', 'RMS_RED', 'mue_RED', 'ER', 'var_ED0'], (0.8848729528439084, 0.8520471294395444))
