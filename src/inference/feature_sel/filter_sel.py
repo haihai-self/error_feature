@@ -11,6 +11,11 @@ plt.style.use(['science', 'ieee'])
 
 
 def varSel(df, ):
+    """
+    方差特征排序
+    :param df:需要训练的数据 DataFrame
+    :return: series 使用方差法排序之后的特征
+    """
     sel_feature = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED',
             'mue_ARED', 'var_ARED', 'RMS_ED', 'RMS_RED', 'ER', 'WCE', 'WCRE']
     feature_var = []
@@ -21,6 +26,11 @@ def varSel(df, ):
 
 
 def chi2Sel(df):
+    """
+    卡方特征排序
+    :param df:需要训练的数据
+    :return:series 使用卡方验证排序后得到的特征排序
+    """
     sel_feature = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED',
             'mue_ARED', 'var_ARED', 'RMS_ED', 'RMS_RED', 'ER', 'WCE', 'WCRE']
     model = SelectKBest(chi2, k=14)
@@ -37,6 +47,11 @@ def chi2Sel(df):
 
 
 def regressionMrmrSel(df):
+    """
+    使用连续特征进行mRMR排序
+    :param df:训练数据
+    :return:mrmr_c 方法得到的特征排序
+    """
     sel_feature = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED',
                    'mue_ARED', 'var_ARED', 'RMS_ED', 'RMS_RED', 'ER', 'WCE', 'WCRE']
     d = df.loc[:, sel_feature].astype(float)
@@ -67,6 +82,11 @@ def regressionMrmrSel(df):
 
 
 def classifyMrmrSel(df):
+    """
+    使用离散特征进行mRMR排序
+    :param df: 训练数据
+    :return: 两个series，分别为使用等间隔以及等密度得到的特征排序
+    """
     sel_feature = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED', 'mue_ARED', 'var_ARED',
                    'RMS_ED', 'RMS_RED', 'ER', 'WCE', 'WCRE', 'single-sided', 'zero-error']
     continuous_feature = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED', 'mue_ARED', 'var_ARED',
@@ -134,6 +154,15 @@ def classifyMrmrSel(df):
 
 
 def cartPlot(df, loc, label_loc, label, tittle):
+    """
+    给定df，绘制折线图
+    :param df:需要绘制的DataFram
+    :param loc: 保存的地址
+    :param label_loc: legend在图中的位置
+    :param label: 按哪一列进行排序
+    :param tittle: 图片标题
+    :return:
+    """
     df_plot = df.rename(columns={'mue_ED0': r'$\mu_E$', 'var_ED0': r'$\sigma_E$', 'mue_ED': r'$\mu_{ED}$', 'NMED': r'$NMED$',
                        'var_ED': r'$\sigma_{ED}$', 'mue_RED': r'$\mu_{RE}$', 'var_RED': r'$\sigma_{RE}$',
                        'mue_ARED': r'$\mu_{RED}$', 'var_ARED': r'$\sigma_{RED}$', 'RMS_ED': r'$rms_E$ ',
