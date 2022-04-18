@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 def str2latex(list):
+    # 将str名称修改成latex格式打印出来
     latex_dict = {'mue_ED0': r'$\mu_E$', 'var_ED0': r'$\sigma_E$', 'mue_ED': r'$\mu_{ED}$', 'NMED': r'$NMED$',
                        'var_ED': r'$\sigma_{ED}$', 'mue_RED': r'$\mu_{RE}$', 'var_RED': r'$\sigma_{RE}$',
                        'mue_ARED': r'$\mu_{RED}$', 'var_ARED': r'$\sigma_{RED}$', 'RMS_ED': r'$rms_E$ ',
@@ -9,8 +10,10 @@ def str2latex(list):
                        }
     for i in list:
         print(latex_dict[i], end=', ')
+    print()
 
 def wrapperClassify():
+    # 得到lvm方法分类模型对应的指标
     data = [[0.9759686120647376, 0.9877390877881315, 0.9360902255639098, 0.9759686120647376, 0.8871580552962045],
             [0.9857773418342325, 0.9926434526728789, 0.9736842105263158, 0.9857773418342325, 0.8894363486601541],
             [0.9749877390877881, 0.9906817067189799, 0.9586466165413534, 0.9749877390877881, 0.8504578966063688],
@@ -35,6 +38,7 @@ def wrapperClassify():
     plt.close()
 
 def wrapperRegression():
+    # 得到lvm方法回归模型对应的指
     data = [[0.07773549004573779, 0.9468117451601555],
             [0.08881568010298237, 0.9611718110937534],
             [0.2545986885971268, 0.8520471294395444],
@@ -72,6 +76,7 @@ def wrapperRegression():
     plt.close()
 
 def dropRankCla():
+    # 绘制droprank得到的特征重要性排序图--分类模型
     df = pd.read_csv('result/drop.csv')
     df_plot = df.rename(
         columns={'mue_ED0': r'$\mu_E$', 'var_ED0': r'$\sigma_E$', 'mue_ED': r'$\mu_{ED}$',
@@ -99,6 +104,7 @@ def dropRankCla():
     plt.close()
 
 def dropRankReg():
+    # 绘制droprank得到的特征重要性排序图--回归模型
     df = pd.read_csv('result/regression_drop_rank.csv')
     df_plot = df.rename(
         columns={'mue_ED0': r'$\mu_E$', 'var_ED0': r'$\sigma_E$', 'mue_ED': r'$\mu_{ED}$',
@@ -126,6 +132,7 @@ def dropRankReg():
     plt.close()
 
 def treeRegModel():
+    # 绘制树模型回归指标
     df_dt = pd.read_csv('result/csv/reg_dt_model.csv', index_col=0)
     df_dt = df_dt.rename(columns={'MAPE':r'$\text{MAPE}_{dt}$',
                           r'$\chi^2$':r'$\chi^2_{dt}$'})
@@ -142,16 +149,9 @@ def treeRegModel():
     plt.savefig('result/tree_reg_model.pdf', bbox_inches='tight')
     plt.show()
 
-if __name__ == '__main__':
-    # dropRankCla()
-    # dropRankReg()
-    # wrapperClassify()
-    # wrapperRegression()
-    treeRegModel()
-
-
-    # dt_cla_fea = ['var_RED', 'single-sided', 'var_ARED', 'mue_ED0', 'ER', 'mue_ARED', 'mue_RED', 'var_ED', 'RMS_ED', 'NMED', 'WCE']
-    # str2latex(dt_cla_fea)
+def feature2latex():
+    dt_cla_fea = ['var_RED', 'single-sided', 'var_ARED', 'mue_ED0', 'ER', 'mue_ARED', 'mue_RED', 'var_ED', 'RMS_ED', 'NMED', 'WCE']
+    str2latex(dt_cla_fea)
     # rf_cla_fea = ['var_ED0', 'WCE', 'mue_ED0', 'var_RED', 'RMS_RED']
     # str2latex(rf_cla_fea)
     # svm_cla_fea = ['var_ED', 'ER', 'WCE', 'WCRE', 'mue_RED', 'RMS_ED', 'RMS_RED', 'mue_ARED', 'single-sided', 'mue_ED', 'var_ARED', 'mue_ED0', 'var_RED']
@@ -167,3 +167,12 @@ if __name__ == '__main__':
     # str2latex(svm_reg_fea)
     # mlp_reg_fea = ['ER', 'mue_ED0', 'zero-error', 'NMED', 'mue_ED', 'var_ARED', 'single-sided', 'var_RED', 'WCRE', 'RMS_RED', 'WCE', 'mue_ARED', 'RMS_ED', 'var_ED']
     # str2latex(mlp_reg_fea)
+
+if __name__ == '__main__':
+    # dropRankCla()
+    # dropRankReg()
+    # wrapperClassify()
+    # wrapperRegression()
+    treeRegModel()
+
+
