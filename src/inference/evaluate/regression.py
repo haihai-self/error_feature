@@ -15,6 +15,12 @@ def score():
     return metrics.make_scorer(mape_score, greater_is_better=False)
 
 def evaluation(y, y_pre):
+    """
+    回归模型评测
+    :param y: list 准确值 一维
+    :param y_pre: list 预测值 一维
+    :return: acc r2
+    """
     y = np.array(y).reshape([-1, 1])
     y_pre = np.array(y_pre).reshape([-1, 1])
     r2 = metrics.r2_score(y, y_pre)
@@ -52,6 +58,12 @@ def sel_res():
     return res_c, res_r
 
 def regressionDraw(df, savename):
+    """
+    绘制domain以及spe回归模型指标图
+    :param df:
+    :param savename:
+    :return:
+    """
     plt.style.use(['science', 'ieee'])
     df = df.sort_values(by='mape', ascending=True)
 
@@ -65,7 +77,12 @@ def regressionDraw(df, savename):
 
 
 def evaluationModelRegression(feature_index, model):
-
+    """
+    模型预测以及评价
+    :param feature_index: 模型训练的特征
+    :param model: 训练好的模型
+    :return: 回归模型评测指标
+    """
     y, y_pre = predict_model.predictRegression(model, feature_index)
     y = np.array(y)
     result = evaluation(y, y_pre)
