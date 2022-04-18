@@ -3,16 +3,12 @@ from sklearn.model_selection import GridSearchCV
 import pandas as pd
 import sys
 sys.path.append('..')
-from models import predict_model
+from models.predict_model import predictClassify, predictSpecClassify, predictRegression, predictSpectRegression
 from sklearn import metrics
+from evaluate import classify, regression
+from error.data_process import processDataSpec, processData
+import matplotlib.pyplot as plt
 
-def macro_tpr(y, y_pre):
-    return metrics.recall_score(y, y_pre, average='macro')
-
-
-def score():
-
-    return metrics.make_scorer(macro_tpr, greater_is_better=True)
 
 def classifyRF(df, feature_index):
 
@@ -20,7 +16,7 @@ def classifyRF(df, feature_index):
     x = df.loc[:, feature_index]
     param = {'n_estimators': range(60, 400, 20)}
     gsearch = GridSearchCV(estimator=RandomForestClassifier(n_estimators=60, oob_score=True, random_state=10)
-                           , param_grid=param, cv=5, n_jobs=-1, scoring=score())
+                           , param_grid=param, cv=5, n_jobs=-1, scoring=classify.score())
     gsearch.fit(x.values, y)
     print(gsearch.best_params_)
     n_estimators = gsearch.best_params_['n_estimators']
@@ -37,7 +33,7 @@ def regressionRF(df, feature_index):
 
     param = {'n_estimators': range(10, 201, 10)}
     gsearch = GridSearchCV(estimator=RandomForestRegressor(n_estimators=60, random_state=10)
-                           , param_grid=param, cv=5, n_jobs=-1)
+                           , param_grid=param, cv=5, n_jobs=-1, scoring=regression.score())
     gsearch.fit(x.values, y)
     print(gsearch.best_params_)
     model = gsearch.best_estimator_
@@ -47,19 +43,74 @@ def regressionRF(df, feature_index):
 
 
 
-    
+def plotDT(df, savename):
+    plt.style.use(['science', 'ieee'])
+    # df = df.sort_values(by='mape', ascending=True)
+    df.to_csv('../result/csv/' + savename + '.csv')
+
+    for index, data in df.iteritems():
+        plt.plot(df.index, data.values, label=index)
+    # plt.legend(label)
+    plt.legend(loc='best')
+    plt.xticks(rotation=300)
+
+    plt.savefig('../result/' + savename + '.pdf', bbox_inches='tight')
+    plt.show()
+
+def rfClaErrorModel():
+    df = pd.read_csv('../../error/source/train_norm.csv')
+    df = processDataSpec(df)
+    feature_index = ['WCRE', 'WCE', 'mue_ED0']
+    # feature_index = ['mue_ED0', 'mue_ED', 'ER']
+
+    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist',  'resnet18cifar', 'vgg16cifar',
+               'resnet34cifar', 'resnet34cifar100']
+    dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
+
+    for index in indexes:
+        if index == 'domain':
+            fixed_feature = ['net', 'dataset', 'concat']
+            df_train = processData(df)
+            model = classifyRF(df_train, feature_index + fixed_feature)
+            y, y_pre = predictClassify(model, feature_index + fixed_feature, index)
+
+        else:
+
+            df_train = df[df['concat'] == index]
+
+            model = classifyRF(df_train, feature_index)
+            y, y_pre = predictSpecClassify(model, feature_index, 'dt', index)
+        res = classify.evaluation(y, y_pre)
+        dt_df.loc[index, :] = res
+    plotDT(dt_df, 'cla_rf_model')
+
+def rfRegErrorModel():
+    df = pd.read_csv('../../error/source/train_norm.csv')
+    df = processDataSpec(df)
+    feature_index = ['var_ED', 'var_RED', 'mue_RED']
+    # feature_index = ['mue_ED0', 'mue_ED', 'ER']
+
+    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
+               'resnet34cifar', 'resnet34cifar100']
+    dt_df = pd.DataFrame(index=indexes, columns=['MAPE', r'$\chi^2$'])
+
+    for index in indexes:
+        if index == 'domain':
+            fixed_feature = ['net', 'dataset', 'concat']
+            df_train = processData(df)
+            model = regressionRF(df_train, feature_index + fixed_feature)
+            y, y_pre = predictRegression(model, feature_index + fixed_feature)
+
+        else:
+
+            df_train = df[df['concat'] == index]
+
+            model = regressionRF(df_train, feature_index)
+            y, y_pre = predictSpectRegression(model, feature_index, 'dt', index)
+        res = regression.evaluation(y, y_pre)
+        dt_df.loc[index, :] = res
+    plotDT(dt_df, 'reg_rf_model')
 
 if __name__ == '__main__':
-    df = pd.read_csv('../../error/source/train_norm.csv')
-    df.loc[df.loc[:, 'single-sided'] == 'NO', 'single-sided'] = 0
-    df.loc[df.loc[:, 'single-sided'] == 'YES', 'single-sided'] = 1
-    df.loc[df.loc[:, 'zero-error'] == 'NO', 'zero-error'] = 0
-    df.loc[df.loc[:, 'zero-error'] == 'YES', 'zero-error'] = 1
-    feature_index = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED', 'mue_ARED', 'var_ARED',
-                     'RMS_ED', 'RMS_RED', 'ER', 'WCE', 'WCRE', 'single-sided', 'zero-error']
-
-    model = classifyRF(df, feature_index)
-    y, y_pre = predict_model.predictClassify(model, feature_index)
-    # print(evaluation(y, y_pre))
-    regressionRF(df, feature_index)
-
+    # rfRegErrorModel()
+    rfClaErrorModel()

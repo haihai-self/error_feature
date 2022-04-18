@@ -3,13 +3,19 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import GridSearchCV
 from evaluate import classify, regression
-
+from sklearn import metrics
+import matplotlib.pyplot as plt
+import sys
+sys.path.append('..')
+from models.predict_model import predictClassify, predictSpecClassify, predictRegression, predictSpectRegression
+from error.data_process import processDataSpec, processData
+from evaluate import classify, regression
 
 def classifySVM(df, feature_index):
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
 
-    param = {'C': [x for x in range(2200, 2401, 25)],
+    param = {'C': [x for x in range(400, 1000, 8)],
              'kernel': ['rbf']}
     gsearch = GridSearchCV(estimator=svm.SVC(C=10, kernel='poly')
                            , param_grid=param, cv=5, n_jobs=-1, scoring=classify.score())
@@ -95,16 +101,51 @@ def regressionSVMSigmoid(df, feature_index):
     model_sigmoid.fit(x, y)
     return model_sigmoid
 
+def plotDT(df, savename):
+    plt.style.use(['science', 'ieee'])
+    # df = df.sort_values(by='mape', ascending=True)
+    df.to_csv('../result/csv/' + savename + '.csv')
+    for index, data in df.iteritems():
+        plt.plot(df.index, data.values, label=index)
+    # plt.legend(label)
+    plt.legend(loc='best')
+    plt.xticks(rotation=300)
+
+    plt.savefig('../result/' + savename + '.pdf', bbox_inches='tight')
+    # plt.show()
+
+
+def svmClaErrorModel():
+    df = pd.read_csv('../../error/source/train_norm.csv')
+    df = processDataSpec(df)
+    # feature_index = ['WCRE', 'WCE', 'mue_ED0']
+    feature_index = ['mue_ED0', 'mue_ED', 'ER']
+    # feature_index = ['var_ED', 'var_RED', 'mue_RED']
+
+    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
+               'resnet34cifar', 'resnet34cifar100']
+    dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
+
+    for index in indexes:
+        if index == 'domain':
+            fixed_feature = ['net', 'dataset', 'concat']
+            df_train = processData(df)
+            model = classifySVM(df_train, feature_index + fixed_feature)
+            y, y_pre = predictClassify(model, feature_index + fixed_feature, 'svm')
+
+        else:
+
+            df_train = df[df['concat'] == index]
+
+            model = classifySVM(df_train, feature_index)
+            y, y_pre = predictSpecClassify(model, feature_index, 'svm', index)
+        res = classify.evaluation(y, y_pre)
+        dt_df.loc[index, :] = res
+    plotDT(dt_df, 'cla_svm_model')
 
 if __name__ == '__main__':
-    df = pd.read_csv('../../error/source/train_norm.csv')
-    df.loc[df.loc[:, 'single-sided'] == 'NO', 'single-sided'] = 0
-    df.loc[df.loc[:, 'single-sided'] == 'YES', 'single-sided'] = 1
-    df.loc[df.loc[:, 'zero-error'] == 'NO', 'zero-error'] = 0
-    df.loc[df.loc[:, 'zero-error'] == 'YES', 'zero-error'] = 1
-    feature_index = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED', 'mue_ARED', 'var_ARED',
-                     'RMS_ED', 'RMS_RED', 'ER', 'WCE', 'WCRE', 'single-sided', 'zero-error']
-    classify_model = classifySVMPoly(df, feature_index)
+    svmClaErrorModel()
+
     # regression_model = regressionSVM(df, feature_index)
 
     # df = pd.read_csv('../../error/source/test_norm.csv')

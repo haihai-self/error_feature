@@ -15,6 +15,8 @@ def wrapperClassify():
             [0.9857773418342325, 0.9926434526728789, 0.9736842105263158, 0.9857773418342325, 0.8894363486601541],
             [0.9749877390877881, 0.9906817067189799, 0.9586466165413534, 0.9749877390877881, 0.8504578966063688],
             [0.973516429622364, 0.9916625796959294, 0.9548872180451128, 0.973516429622364, 0.8853902252339932]]
+    data = np.array(data)
+    data = data * 100
     columns = ['acc-1', 'acc-2', 'recall-1', 'weight-tpr', 'macro-tpr']
     index = ['DT', 'RF', 'SVM', 'MLP']
     plt.style.use(['science', 'ieee'])
@@ -37,6 +39,8 @@ def wrapperRegression():
             [0.08881568010298237, 0.9611718110937534],
             [0.2545986885971268, 0.8520471294395444],
             [0.06844977317607073, 0.9235117926731133]]
+    data = np.array(data)
+    data = data * 100
     columns = ['mape', r'$R^2$']
     index = ['DT', 'RF', 'SVM', 'MLP']
     plt.style.use(['science', 'ieee'])
@@ -121,11 +125,30 @@ def dropRankReg():
     # plt.show()
     plt.close()
 
+def treeRegModel():
+    df_dt = pd.read_csv('result/csv/reg_dt_model.csv', index_col=0)
+    df_dt = df_dt.rename(columns={'MAPE':r'$\text{MAPE}_{dt}$',
+                          r'$\chi^2$':r'$\chi^2_{dt}$'})
+    df_rf = pd.read_csv('result/csv/reg_rf_model.csv', index_col=0)
+    df_rf = df_rf.rename(columns={'MAPE': r'$\text{MAPE}_{rf}$',
+                                  r'$\chi^2$': r'$\chi^2_{rf}$'})
+    plt.style.use(['science', 'ieee'])
+    df = pd.merge(df_dt, df_rf,left_index=True, right_index=True)
+    for index, data in df.iteritems():
+        plt.plot(df.index, data.values, label=index)
+    # plt.legend(label)
+    plt.legend(loc='best')
+    plt.xticks(rotation=300)
+    plt.savefig('result/tree_reg_model.pdf', bbox_inches='tight')
+    plt.show()
+
 if __name__ == '__main__':
-    dropRankCla()
-    dropRankReg()
+    # dropRankCla()
+    # dropRankReg()
     # wrapperClassify()
     # wrapperRegression()
+    treeRegModel()
+
 
     # dt_cla_fea = ['var_RED', 'single-sided', 'var_ARED', 'mue_ED0', 'ER', 'mue_ARED', 'mue_RED', 'var_ED', 'RMS_ED', 'NMED', 'WCE']
     # str2latex(dt_cla_fea)
