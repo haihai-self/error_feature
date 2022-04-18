@@ -4,6 +4,13 @@ import pandas as pd
 from error.data_process import processData, processDataSpec
 
 def predictClassify(model, feature_index, model_name):
+    """
+    domain模型--预测分类模型对应的准确率
+    :param model: 模型
+    :param feature_index: 训练模型所用到的特征
+    :param model_name: 模型对应的名字，MLP SVM DT RF
+    :return: y y_pre(top1, top2) y_pre 为2维
+    """
     # 读取测试文件
     df = pd.read_csv('../../error/source/test_norm.csv')
     df = processData(df)
@@ -27,6 +34,14 @@ def predictClassify(model, feature_index, model_name):
     return y, y_pre
 
 def predictSpecClassify(model, feature_index, model_name, spec):
+    """
+    spec模型---预测分类模型对应的准确率
+    :param model: 模型
+    :param feature_index: 训练模型所用到的特征
+    :param model_name: 模型对应的名字，MLP SVM DT RF
+    :param spec: 是哪一种应用，vgg16mnist, resnet18cifar, resnet34cifar100等
+    :return: y y_pre(top1, top2) y_pre 为2维
+    """
     # 读取测试文件
     df = pd.read_csv('../../error/source/test_norm.csv')
     df = processDataSpec(df)
@@ -52,6 +67,13 @@ def predictSpecClassify(model, feature_index, model_name, spec):
     return y, y_pre
 
 def predictRegression(model, feature_index):
+    """
+    domain模型--预测回归模型准确率
+    :param model: 模型
+    :param feature_index: 训练模型所用到的特征
+    :param model_name: 模型对应的名字，MLP SVM DT RF
+    :return: y y_pre 都是一维
+    """
     # 读取测试文件
     df = pd.read_csv('../../error/source/test_norm.csv')
     df = processData(df)
@@ -63,6 +85,14 @@ def predictRegression(model, feature_index):
     return y, y_pre
 
 def predictSpectRegression(model, feature_index, model_name, spec):
+    """
+    spec模型---预测回归模型准确率
+    :param model: 模型
+    :param feature_index: 训练模型所用到的特征
+    :param model_name: 模型对应的名字，MLP SVM DT RF
+    :param spec: 是哪一种应用，vgg16mnist, resnet18cifar, resnet34cifar100等
+    :return: y y_pre 都是一维
+    """
     # 读取测试文件
     df = pd.read_csv('../../error/source/test_norm.csv')
     df = processDataSpec(df)
