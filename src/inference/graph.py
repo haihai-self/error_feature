@@ -30,11 +30,11 @@ def wrapperClassify():
     for index, data in df.iteritems():
         plt.plot(df.index, data, label=index)
 
-    plt.title('lvm classify feature select')
-    plt.yticks([x / 10 for x in range(8, 11)])
+    # plt.title('lvm classify feature select')
+    # plt.yticks([x / 10 for x in range(8, 11)])
     plt.legend(loc='lower left')
     plt.savefig('result/lvm_sel.pdf', bbox_inches='tight')
-    # plt.show()
+    plt.show()
     plt.close()
 
 def wrapperRegression():
@@ -68,7 +68,7 @@ def wrapperRegression():
         count += 1
         # plt.hist(df.index, data, label=index)
 
-    plt.title('lvm classify feature select')
+    # plt.title('lvm classify feature select')
     plt.xticks(label=['mape', r'$R^2$'])
     plt.legend(loc='upper left')
     plt.savefig('result/lvm_regression.pdf', bbox_inches='tight')
@@ -171,8 +171,8 @@ def feature2latex():
 if __name__ == '__main__':
     # dropRankCla()
     # dropRankReg()
-    # wrapperClassify()
+    wrapperClassify()
     # wrapperRegression()
-    treeRegModel()
+    # treeRegModel()
 
 
