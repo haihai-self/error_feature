@@ -11,6 +11,13 @@ from error.data_process import processData
 
 
 def evaluationModelClassify(feature_index, model, model_name):
+    """
+    分类模型评价
+    :param feature_index: 模型训练使用的特征
+    :param model: 需要测试的模型
+    :param model_name: 模型对应的名称 SVM DT MLP RF等
+    :return: 分类模型测试结果 top1 top2 recall-1 weight-tpr macro-tpr
+    """
 
     y, y_pre = predict_model.predictClassify(model, feature_index, model_name)
     y = np.array(y)
@@ -20,6 +27,13 @@ def evaluationModelClassify(feature_index, model, model_name):
 
 
 def lvmClassify(df, func, model_name):
+    """
+    LVM框架对模型进行特征筛选
+    :param df: 需要训练你的数据
+    :param func: 对应的模型
+    :param model_name: 模型名称SVM DT MLP RF
+    :return: 两个list list1 筛选出的特征， list2 对应模型的评价结果
+    """
     e = [0]
     feature_index = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED', 'mue_ARED', 'var_ARED',
                      'RMS_ED', 'RMS_RED', 'ER', 'WCE', 'WCRE', 'single-sided', 'zero-error']
@@ -45,7 +59,12 @@ def lvmClassify(df, func, model_name):
 
 
 def evaluationModelRegression(feature_index, model):
-
+    """
+    回归模型评价
+    :param feature_index:训练使用的特征
+    :param model:已经训练好的模型
+    :return: list acc r2
+    """
     y, y_pre = predict_model.predictRegression(model, feature_index)
     y = np.array(y)
     result = regression.evaluation(y, y_pre)
@@ -53,6 +72,12 @@ def evaluationModelRegression(feature_index, model):
     return result
 
 def lvmRegression(df, func):
+    """
+    LVM回归模型特征筛选
+    :param df: 需要训练你的数据 DataFrame
+    :param func: 模型名称 SVM MLP DT RF
+    :return: 2个list list1 筛选出的特征 list2 回归模型评价指标
+    """
     e = [1000]
     feature_index = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED', 'mue_ARED', 'var_ARED',
                      'RMS_ED', 'RMS_RED', 'ER', 'WCE', 'WCRE', 'single-sided', 'zero-error']
