@@ -17,6 +17,12 @@ import matplotlib.pyplot as plt
 
 
 def classifyMLP(df, feature_sel):
+    """
+    MLP回归模型
+    :param df: train data DataFrame 数据结构
+    :param feature_sel: 需要选择的特征
+    :return: MLP分类模型
+    """
     y = df.loc[:,'classify']
     x = df.loc[:, feature_sel]
 
@@ -47,11 +53,18 @@ def classifyMLP(df, feature_sel):
 
 
 def regressionMLP(df, feature_sel):
+    """
+    MLP回归模型
+    :param df: train DataFrame 数据
+    :param feature_sel: list 需要用到的特征
+    :return: MLP模型
+    """
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_sel]
 
     dataset = tf.data.Dataset.from_tensor_slices((x, y))
     train_dataset = dataset.shuffle(len(df)).batch(20)
+    # 模型参数修改
     model = keras.Sequential([
         keras.layers.Dense(128, activation='relu'),
         keras.layers.Dense(256, activation='relu'),
@@ -69,7 +82,12 @@ def regressionMLP(df, feature_sel):
     return model
 
 
-def plotDT(df, savename):
+def plotMLP(df, savename):
+    """
+    绘制df数据折线图
+    :param df: DataFrame 数据结构，
+    :param savename:保存pdf的文件名
+    """
     plt.style.use(['science', 'ieee'])
     # df = df.sort_values(by='mape', ascending=True)
     df.to_csv('../result/csv/' + savename + '.csv')
@@ -84,6 +102,10 @@ def plotDT(df, savename):
 
 
 def mlpClaErrorModel():
+    """
+    mlp分类模型
+    :return: 绘制分类对应指标图
+    """
     df = pd.read_csv('../../error/source/train_norm.csv')
     df = processDataSpec(df)
     # feature_index = ['WCRE', 'WCE', 'mue_ED0']
@@ -109,7 +131,7 @@ def mlpClaErrorModel():
             y, y_pre = predictSpecClassify(model, feature_index, 'mlp', index)
         res = classify.evaluation(y, y_pre)
         dt_df.loc[index, :] = res
-    plotDT(dt_df, 'cla_mlp_model')
+    plotMLP(dt_df, 'cla_mlp_model')
 
 if __name__ == '__main__':
     mlpClaErrorModel()
