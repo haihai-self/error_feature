@@ -11,6 +11,12 @@ import matplotlib.pyplot as plt
 
 
 def classifyRF(df, feature_index):
+    """
+    RF分类模型，搜索最优C
+    :param df: train data DataFrame 数据结构
+    :param feature_index: list 需要用到的feature
+    :return: RF model
+    """
 
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
@@ -28,6 +34,12 @@ def classifyRF(df, feature_index):
 
 
 def regressionRF(df, feature_index):
+    """
+    RF回归模型，搜索最优C
+    :param df: train data DataFrame 数据结构
+    :param feature_index: list 需要用到的feature
+    :return: RF model
+    """
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_index]
 
@@ -43,7 +55,12 @@ def regressionRF(df, feature_index):
 
 
 
-def plotDT(df, savename):
+def plotRF(df, savename):
+    """
+    绘制df数据折线图
+    :param df: DataFrame 数据结构，
+    :param savename:保存pdf的文件名
+    """
     plt.style.use(['science', 'ieee'])
     # df = df.sort_values(by='mape', ascending=True)
     df.to_csv('../result/csv/' + savename + '.csv')
@@ -58,10 +75,13 @@ def plotDT(df, savename):
     plt.show()
 
 def rfClaErrorModel():
+    """
+    分类误差模型，训练并绘制模型指标
+    :return:
+    """
     df = pd.read_csv('../../error/source/train_norm.csv')
     df = processDataSpec(df)
     feature_index = ['WCRE', 'WCE', 'mue_ED0']
-    # feature_index = ['mue_ED0', 'mue_ED', 'ER']
 
     indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist',  'resnet18cifar', 'vgg16cifar',
                'resnet34cifar', 'resnet34cifar100']
@@ -82,13 +102,16 @@ def rfClaErrorModel():
             y, y_pre = predictSpecClassify(model, feature_index, 'dt', index)
         res = classify.evaluation(y, y_pre)
         dt_df.loc[index, :] = res
-    plotDT(dt_df, 'cla_rf_model')
+    plotRF(dt_df, 'cla_rf_model')
 
 def rfRegErrorModel():
+    """
+    回归误差模型，训练并绘制指标
+    :return:
+    """
     df = pd.read_csv('../../error/source/train_norm.csv')
     df = processDataSpec(df)
     feature_index = ['var_ED', 'var_RED', 'mue_RED']
-    # feature_index = ['mue_ED0', 'mue_ED', 'ER']
 
     indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
                'resnet34cifar', 'resnet34cifar100']
@@ -109,7 +132,7 @@ def rfRegErrorModel():
             y, y_pre = predictSpectRegression(model, feature_index, 'dt', index)
         res = regression.evaluation(y, y_pre)
         dt_df.loc[index, :] = res
-    plotDT(dt_df, 'reg_rf_model')
+    plotRF(dt_df, 'reg_rf_model')
 
 if __name__ == '__main__':
     # rfRegErrorModel()
