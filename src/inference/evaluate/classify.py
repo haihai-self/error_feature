@@ -13,12 +13,20 @@ def macro_tpr(y, y_pre):
 
 
 def score():
-
     return metrics.make_scorer(macro_tpr, greater_is_better=True)
 
 def evaluation(y, y_pre):
+    """
+    求出分类预测得到的对应的指标
+    :param y: 真实标签，一维
+    :param y_pre: 预测标签，二维，分别为top1预测概率以及top2预测概率
+    :return: list top1 top2 recall-1 weight-tpr macro-tpr
+    """
+
+    # 计算top1
     top1 = metrics.accuracy_score(y, y_pre[:, 0])
 
+    # 计算top2
     count = 0
     for i in range(len(y_pre)):
         if y[i] == y_pre[i][0] or y[i] == y_pre[i][1]:
@@ -41,7 +49,10 @@ def evaluation(y, y_pre):
 
 
 def sel_res():
-
+    """
+    特征排序的结果
+    :return: 两个dict res_c 分类模型特征排序结果, res_r 回归模型排序结果
+    """
     res_c = {r'$\chi^2$':['mue_ED', 'NMED', 'mue_ED0'],
              'var':['var_ED', 'var_RED', 'mue_RED'],
              r'$mr_c$':['WCRE','WCE','mue_ED0'],
@@ -67,6 +78,13 @@ def sel_res():
     return res_c, res_r
 
 def evaluationModelClassify(feature_sel, model, model_name):
+    """
+    模型的预测以及评分
+    :param feature_sel: list  训练选择的特征
+    :param model: 训练好的模型
+    :param model_name: 模型名称
+    :return: 模型的评价指标, list top1 top2 recall-1等
+    """
 
     y, y_pre = predict_model.predictClassify(model, feature_sel, model_name)
     y = np.array(y)
@@ -75,6 +93,12 @@ def evaluationModelClassify(feature_sel, model, model_name):
     return result
 
 def classifyDraw(df, savename):
+    """
+    根据DataFrame绘制折线图
+    :param df: DataFarme
+    :param savename: 需要保存的名字
+    :return:
+    """
     plt.style.use(['science', 'ieee'])
     df = df.sort_values(by='macro-tpr', ascending=False)
     for index, data in df.iteritems():
