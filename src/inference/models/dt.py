@@ -10,6 +10,12 @@ from evaluate import classify, regression
 
 
 def classifyDecisionTree(df, feature_index):
+    """
+    使用制定的特征训练分类DT
+    :param df: train data DataFrame数据类型
+    :param feature_index: 选择训练的特征 list
+    :return: DT分类模型
+    """
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
 
@@ -20,6 +26,12 @@ def classifyDecisionTree(df, feature_index):
 
 
 def regressionDecisionTree(df, feature_index):
+    """
+    使用制定的特征训练回归DT
+    :param df: train data DataFrame数据类型
+    :param feature_index: 选择训练的特征 list
+    :return: DT分类模型
+    """
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_index]
 
@@ -29,6 +41,12 @@ def regressionDecisionTree(df, feature_index):
     return tree_model
 
 def plotDT(df, savename):
+    """
+    绘制模型对应的指标图
+    :param df: plot data DataFrame数据结构
+    :param savename: 保存的名字, str
+    :return:
+    """
     plt.style.use(['science', 'ieee'])
     # df = df.sort_values(by='mape', ascending=True)
     df.to_csv('../result/csv/' + savename + '.csv')
@@ -42,12 +60,17 @@ def plotDT(df, savename):
     plt.show()
 
 def dfClaErrorModel():
+    """
+    构建决策树误差模型，并绘制相应的指标图
+    :return:
+    """
     df = pd.read_csv('../../error/source/train_norm.csv')
     df = processDataSpec(df)
     feature_index = ['WCRE', 'WCE', 'mue_ED0']
     # feature_index = ['mue_ED0', 'mue_ED', 'ER']
     # feature_index = ['var_ED', 'var_RED', 'mue_RED']
 
+    # 对应的spec类型
     indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'resnet18cifar', 'vgg16cifar',
                'resnet34cifar', 'resnet34cifar100']
     dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
@@ -70,11 +93,17 @@ def dfClaErrorModel():
     plotDT(dt_df, 'cla_dt_model')
 
 def dfRegErrorModel():
+    """
+    构建决策树回归误差模型, 并绘制指标图
+    :return:
+    """
     df = pd.read_csv('../../error/source/train_norm.csv')
     df = processDataSpec(df)
+    # 需要的特征
     feature_index = ['var_ED', 'var_RED', 'mue_RED']
     # feature_index = ['mue_ED0', 'mue_ED', 'ER']
 
+    # 对应的spec类型
     indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
                'resnet34cifar', 'resnet34cifar100']
     dt_df = pd.DataFrame(index=indexes, columns=['MAPE', r'$\chi^2$'])
