@@ -14,6 +14,12 @@ from evaluate import classify, regression
 
 
 def classifySVM(df, feature_index):
+    """
+    svm 分类模型，需要搜索
+    :param df: train data DataFrame 数据结构
+    :param feature_index: list 需要用到的feature
+    :return: svm model
+    """
     # svm分类模型， 搜素最优参数
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
@@ -32,7 +38,12 @@ def classifySVM(df, feature_index):
 
 
 def classifySVMPoly(df, feature_index):
+    """
     # svm poly分类模型
+    :param df: train data DataFrame 数据结构
+    :param feature_index: list 需要用到的feature
+    :return: svm model
+    """
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
 
@@ -43,7 +54,12 @@ def classifySVMPoly(df, feature_index):
 
 
 def classifySVMRbf(df, feature_index):
+    """
     # svm rbf 分类模型
+    :param df: train data DataFrame 数据结构
+    :param feature_index: list 需要用到的feature
+    :return: svm model
+    """
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
 
@@ -54,7 +70,12 @@ def classifySVMRbf(df, feature_index):
 
 
 def classifySVMSifmoid(df, feature_index):
+    """
     # svm sigmoid 分类模型
+    :param df: train data DataFrame 数据结构
+    :param feature_index: list 需要用到的feature
+    :return: svm model
+    """
     y = df.loc[:, 'classify']
     x = df.loc[:, feature_index]
 
@@ -65,7 +86,12 @@ def classifySVMSifmoid(df, feature_index):
 
 
 def regressionSVM(df, feature_index):
+    """
     # svm 回归最优模型， 搜索最优参数
+    :param df: train data DataFrame 数据结构
+    :param feature_index: list 需要用到的feature
+    :return: svm model
+    """
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_index]
 
@@ -82,7 +108,12 @@ def regressionSVM(df, feature_index):
 
 
 def regressionSVMPoly(df, feature_index):
+    """
     # svm poly 回归最优模型
+    :param df: train data DataFrame 数据结构
+    :param feature_index: list 需要用到的feature
+    :return: svm model
+    """
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_index]
 
@@ -93,7 +124,12 @@ def regressionSVMPoly(df, feature_index):
 
 
 def regressionSVMRbf(df, feature_index):
+    """
     # svm rbf 回归最优模型
+    :param df: train data DataFrame 数据结构
+    :param feature_index: list 需要用到的feature
+    :return: svm model
+    """
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_index]
 
@@ -104,7 +140,12 @@ def regressionSVMRbf(df, feature_index):
 
 
 def regressionSVMSigmoid(df, feature_index):
+    """
     # svm sigmoid 回归最优模型
+    :param df: train data DataFrame 数据结构
+    :param feature_index: list 需要用到的feature
+    :return: svm model
+    """
     y = df.loc[:, 'untrained_acc']
     x = df.loc[:, feature_index]
 
