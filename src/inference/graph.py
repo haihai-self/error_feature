@@ -1,6 +1,28 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from mpl_toolkits import mplot3d
+
+
+def feature2latex():
+    treeRegModel()
+    # dt_cla_fea = ['var_RED', 'single-sided', 'var_ARED', 'mue_ED0', 'ER', 'mue_ARED', 'mue_RED', 'var_ED', 'RMS_ED', 'NMED', 'WCE']
+    # str2latex(dt_cla_fea)
+    # rf_cla_fea = ['var_ED0', 'WCE', 'mue_ED0', 'var_RED', 'RMS_RED']
+    # str2latex(rf_cla_fea)
+    # svm_cla_fea = ['var_ED', 'ER', 'WCE', 'WCRE', 'mue_RED', 'RMS_ED', 'RMS_RED', 'mue_ARED', 'single-sided', 'mue_ED', 'var_ARED', 'mue_ED0', 'var_RED']
+    # str2latex(svm_cla_fea)
+    # mlp_cla_fea = ['NMED', 'RMS_RED', 'mue_ED0', 'WCE', 'mue_ARED', 'var_ED0', 'RMS_ED', 'zero-error', 'ER', 'mue_RED', 'mue_ED', 'single-sided']
+    # str2latex(mlp_cla_fea)
+
+    # dt_reg_fea = ['WCE', 'mue_ARED', 'mue_ED', 'NMED', 'ER', 'mue_ED0', 'mue_RED', 'RMS_ED', 'WCRE', 'var_RED', 'var_ARED', 'var_ED0', 'zero-error']
+    # str2latex(dt_reg_fea)
+    # rf_reg_fea = ['var_ARED', 'RMS_ED', 'zero-error', 'mue_ED0', 'WCRE', 'var_ED0', 'RMS_RED', 'var_ED', 'var_RED', 'WCE', 'mue_ED', 'mue_ARED', 'single-sided']
+    # str2latex(rf_reg_fea)
+    # svm_reg_fea = ['WCE', 'var_ED', 'NMED', 'var_ARED', 'mue_ARED', 'zero-error', 'mue_ED0', 'WCRE', 'mue_ED', 'RMS_ED', 'single-sided', 'var_RED', 'RMS_RED', 'mue_RED', 'ER', 'var_ED0']
+    # str2latex(svm_reg_fea)
+    # mlp_reg_fea = ['ER', 'mue_ED0', 'zero-error', 'NMED', 'mue_ED', 'var_ARED', 'single-sided', 'var_RED', 'WCRE', 'RMS_RED', 'WCE', 'mue_ARED', 'RMS_ED', 'var_ED']
+    # str2latex(mlp_reg_fea)
 def str2latex(list):
     # 将str名称修改成latex格式打印出来
     latex_dict = {'mue_ED0': r'$\mu_E$', 'var_ED0': r'$\sigma_E$', 'mue_ED': r'$\mu_{ED}$', 'NMED': r'$NMED$',
@@ -149,31 +171,42 @@ def treeRegModel():
     plt.savefig('result/tree_reg_model.pdf', bbox_inches='tight')
     plt.show()
 
-def feature2latex():
-    treeRegModel()
-    dt_cla_fea = ['var_RED', 'single-sided', 'var_ARED', 'mue_ED0', 'ER', 'mue_ARED', 'mue_RED', 'var_ED', 'RMS_ED', 'NMED', 'WCE']
-    str2latex(dt_cla_fea)
-    # rf_cla_fea = ['var_ED0', 'WCE', 'mue_ED0', 'var_RED', 'RMS_RED']
-    # str2latex(rf_cla_fea)
-    # svm_cla_fea = ['var_ED', 'ER', 'WCE', 'WCRE', 'mue_RED', 'RMS_ED', 'RMS_RED', 'mue_ARED', 'single-sided', 'mue_ED', 'var_ARED', 'mue_ED0', 'var_RED']
-    # str2latex(svm_cla_fea)
-    # mlp_cla_fea = ['NMED', 'RMS_RED', 'mue_ED0', 'WCE', 'mue_ARED', 'var_ED0', 'RMS_ED', 'zero-error', 'ER', 'mue_RED', 'mue_ED', 'single-sided']
-    # str2latex(mlp_cla_fea)
 
-    # dt_reg_fea = ['WCE', 'mue_ARED', 'mue_ED', 'NMED', 'ER', 'mue_ED0', 'mue_RED', 'RMS_ED', 'WCRE', 'var_RED', 'var_ARED', 'var_ED0', 'zero-error']
-    # str2latex(dt_reg_fea)
-    # rf_reg_fea = ['var_ARED', 'RMS_ED', 'zero-error', 'mue_ED0', 'WCRE', 'var_ED0', 'RMS_RED', 'var_ED', 'var_RED', 'WCE', 'mue_ED', 'mue_ARED', 'single-sided']
-    # str2latex(rf_reg_fea)
-    # svm_reg_fea = ['WCE', 'var_ED', 'NMED', 'var_ARED', 'mue_ARED', 'zero-error', 'mue_ED0', 'WCRE', 'mue_ED', 'RMS_ED', 'single-sided', 'var_RED', 'RMS_RED', 'mue_RED', 'ER', 'var_ED0']
-    # str2latex(svm_reg_fea)
-    # mlp_reg_fea = ['ER', 'mue_ED0', 'zero-error', 'NMED', 'mue_ED', 'var_ARED', 'single-sided', 'var_RED', 'WCRE', 'RMS_RED', 'WCE', 'mue_ARED', 'RMS_ED', 'var_ED']
-    # str2latex(mlp_reg_fea)
+
+def threshold():
+    df = pd.read_csv('../error/source/dataset.csv')
+    df_plt = df[df['concat'] == 'vgg16cifar']
+    df_plt.sort_values(by='mue_ED0')
+
+    plt.style.use(['science','ieee'])
+    ax = plt.axes(projection='3d')
+    feature_sel = ['mue_ED0', 'mue_ED', 'ER']
+
+    marker = ['o', 'x']
+    for i in range(2):
+        x = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[0]]
+        y = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[1]]
+
+        z = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[2]]
+
+        ax.scatter3D(x, y, z, s=4, label='class%d'%(i), marker=marker[i])
+    ax.set_xlabel(r'$\mu_{ED}$')
+    ax.set_ylabel(r'$\mu_E$')
+    ax.set_zlabel(r'$RE$')
+
+    plt.legend()
+    plt.savefig('result/threshold.pdf')
+    plt.show()
+
+
+
 
 if __name__ == '__main__':
     # dropRankCla()
     # dropRankReg()
     # wrapperClassify()
     # wrapperRegression()
-    treeRegModel()
+    # treeRegModel()
+    threshold()
 
 

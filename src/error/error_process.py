@@ -29,6 +29,8 @@ if __name__ == '__main__':
     df_train = pd.read_csv('./source/train_data.csv')
     df_test = pd.read_csv('./source/test_data.csv')
     df_val = pd.read_csv('./source/val_data.csv')
+    df_dataset = pd.concat([df_train, df_test])
+    df_dataset.to_csv('./source/dataset.csv', index=False)
 
     # 得到训练集参数 用于归一化
     des = df_train.describe(percentiles=[0.5, 0.6, 0.7, 0.71, 0.72, 0.73, 0.74])
