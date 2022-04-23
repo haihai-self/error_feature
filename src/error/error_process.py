@@ -22,11 +22,13 @@ if __name__ == '__main__':
     df = pd.merge(df, df_acc, on='mul_name')
 
     # 分割训练集测试集
-    df = df.sample(frac=1.0)  # 全部打乱
-    cut_idx = int(round(0.25 * df.shape[0]))
-    df_test, df_train = df.iloc[:cut_idx], df.iloc[cut_idx:]
+
+    # df = df.sample(frac=1.0, random_state=10)  # 全部打乱
+    # cut_idx = int(round(0.25 * df.shape[0]))
+    # df_test, df_train = df.iloc[:cut_idx], df.iloc[cut_idx:]
     df_train = pd.read_csv('./source/train_data.csv')
     df_test = pd.read_csv('./source/test_data.csv')
+    df_val = pd.read_csv('./source/val_data.csv')
 
     # 得到训练集参数 用于归一化
     des = df_train.describe(percentiles=[0.5, 0.6, 0.7, 0.71, 0.72, 0.73, 0.74])
@@ -48,9 +50,16 @@ if __name__ == '__main__':
         df_test.loc[:, index] = (df_test.loc[:, index] - des.loc['min', index]) / (
                 des.loc['73%', index] - des.loc['min', index])
 
+        # 设置验证集
+        df_val.loc[df_val.loc[:, index] >= des.loc['73%', index], index] = des.loc['73%', index]
+        df_val.loc[:, index] = (df_val.loc[:, index] - des.loc['min', index]) / (
+                des.loc['73%', index] - des.loc['min', index])
+
     # 保存
-    df_train_set_max.to_csv('./source/train_norm.csv')
-    df_test.to_csv('./source/test_norm.csv')
-    densPlot(df_train_set_max, './result/density_setmax.pdf', 'upper left')
-    densPlot(df_train_not_max, './result/density_nomax.pdf', 'upper right')
+    df_train_set_max.to_csv('./source/train_norm.csv', index=False)
+    df_test.to_csv('./source/test_norm.csv', index=False)
+    df_val.to_csv('./source/val_norm.csv', index=False)
+
+    # densPlot(df_train_set_max, './result/density_setmax.pdf', 'upper left')
+    # densPlot(df_train_not_max, './result/density_nomax.pdf', 'upper right')
 

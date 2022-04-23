@@ -29,7 +29,8 @@ def classifyRF(df, feature_index):
     model = RandomForestClassifier(n_estimators=n_estimators, oob_score=True, random_state=10)
     # model = RandomForestClassifier(n_estimators=, oob_score=True, random_state=10)
     model.fit(x, y)
-
+    print(model.get_params())
+    # model.max_depth
     return model
 
 

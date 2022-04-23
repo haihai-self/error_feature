@@ -45,7 +45,7 @@ def sel_res():
              'dfr':['mue_ED0', 'mue_ED', 'ER']
              }
     res_r = {r'$\chi^2$':['mue_ED', 'NMED', 'mue_ED0'],
-             'var':['var_ED', 'var_RED', 'mue_RED'],
+             r'$\sigma^2$':['mue_ED0', 'mue_ED', 'ER'],
              r'$mr_c$':['WCRE','WCE','mue_ED0'],
              r'$mr_{Dd}$':['single-sided', 'ER', 'zero-error'],
              r'$mr_{Dq}$':['zero-error', 'single-sided', 'WCRE'],
@@ -53,7 +53,7 @@ def sel_res():
              r'$l_{dt}$':['WCE', 'mue_ARED', 'mue_ED', 'NMED', 'ER', 'mue_ED0', 'mue_RED', 'RMS_ED', 'WCRE', 'var_RED', 'var_ARED', 'var_ED0', 'zero-error'],
              r'$l_{rf}$':['var_ARED', 'RMS_ED', 'zero-error', 'mue_ED0', 'WCRE', 'var_ED0', 'RMS_RED', 'var_ED', 'var_RED', 'WCE', 'mue_ED', 'mue_ARED', 'single-sided'],
              r'$l_{mlp}$':['WCE', 'var_ED', 'NMED', 'var_ARED', 'mue_ARED', 'zero-error', 'mue_ED0', 'WCRE', 'mue_ED', 'RMS_ED', 'single-sided', 'var_RED', 'RMS_RED', 'mue_RED', 'ER', 'var_ED0'],
-             'dfr':['mue_ED0', 'mue_ED', 'ER']
+             'dfr':['var_ED', 'var_RED', 'mue_RED']
              }
     return res_c, res_r
 
@@ -65,7 +65,7 @@ def regressionDraw(df, savename):
     :return:
     """
     plt.style.use(['science', 'ieee'])
-    df = df.sort_values(by='mape', ascending=True)
+    df = df.sort_values(by='MAPE', ascending=True)
 
 
     for index, data in df.iteritems():
@@ -76,14 +76,14 @@ def regressionDraw(df, savename):
     plt.show()
 
 
-def evaluationModelRegression(feature_index, model):
+def evaluationModelRegression(feature_index, model, test_or_val):
     """
     模型预测以及评价
     :param feature_index: 模型训练的特征
     :param model: 训练好的模型
     :return: 回归模型评测指标
     """
-    y, y_pre = predict_model.predictRegression(model, feature_index)
+    y, y_pre = predict_model.predictRegression(model, feature_index, test_or_val)
     y = np.array(y)
     result = evaluation(y, y_pre)
 
@@ -92,23 +92,25 @@ def evaluationModelRegression(feature_index, model):
 if __name__ == '__main__':
     res_c, res_r = sel_res()
     df = pd.read_csv('../../error/source/train_norm.csv')
-    dt_df = pd.DataFrame(index=res_r.keys(), columns=['mape', r'$R^2$'])
-    svm_df = pd.DataFrame(index=res_r.keys(), columns=['mape', r'$R^2$'])
-    rf_df = pd.DataFrame(index=res_r.keys(), columns=['mape', r'$R^2$'])
-    mlp_df = pd.DataFrame(index=res_r.keys(), columns=['mape', r'$R^2$'])
+    dt_df = pd.DataFrame(index=res_r.keys(), columns=['MAPE', r'$R^2$'])
+    svm_df = pd.DataFrame(index=res_r.keys(), columns=['MAPE', r'$R^2$'])
+    rf_df = pd.DataFrame(index=res_r.keys(), columns=['MAPE', r'$R^2$'])
+    mlp_df = pd.DataFrame(index=res_r.keys(), columns=['MAPE', r'$R^2$'])
 
-    df_dict = {'dt': dt_df,
+    df_dict = {
+                'dt': dt_df,
                'svm': svm_df,
                'mlp': mlp_df,
-               'rf':rf_df}
+               'rf':rf_df
+    }
     df = processData(df)
 
     # 添加模型
     func_dict = {}
     # func_dict['dt'] = dt.regressionDecisionTree
-    func_dict['rf'] = rf.regressionRF
+    # func_dict['rf'] = rf.regressionRF
     # func_dict['svm'] = svm.regressionSVM
-    # func_dict['mlp'] = mlp.regressionMLP
+    func_dict['mlp'] = mlp.regressionMLP
 
     fixed_feature = ['net', 'dataset', 'concat']
     count = 0
@@ -119,8 +121,10 @@ if __name__ == '__main__':
 
         for func in func_dict:
             model = func_dict[func](df, feature_sel + fixed_feature)
-            acc = evaluationModelRegression(feature_sel + fixed_feature, model)
+            acc = evaluationModelRegression(feature_sel + fixed_feature, model, True)
             df_dict[func].loc[key, :] = acc
+
+    # print(df_dict)
 
     for key in func_dict:
         regressionDraw(df_dict[key], 'reg_' + key+'_sel_reg.pdf')

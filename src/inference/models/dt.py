@@ -21,6 +21,7 @@ def classifyDecisionTree(df, feature_index):
 
     tree_model = tree.DecisionTreeClassifier(criterion='gini')
     tree_model.fit(x, y)
+    print(tree_model.tree_.node_count)
 
     return tree_model
 
@@ -37,6 +38,7 @@ def regressionDecisionTree(df, feature_index):
 
     tree_model = tree.DecisionTreeRegressor()
     tree_model.fit(x, y)
+    print(tree_model.tree_.node_count)
 
     return tree_model
 

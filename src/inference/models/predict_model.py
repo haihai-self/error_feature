@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from error.data_process import processData, processDataSpec
 
-def predictClassify(model, feature_index, model_name):
+def predictClassify(model, feature_index, model_name, test_or_val=True):
     """
     domain模型--预测分类模型对应的准确率
     :param model: 模型
@@ -12,7 +12,10 @@ def predictClassify(model, feature_index, model_name):
     :return: y y_pre(top1, top2) y_pre 为2维
     """
     # 读取测试文件
-    df = pd.read_csv('../../error/source/test_norm.csv')
+    if test_or_val:
+        df = pd.read_csv('../../error/source/test_norm.csv')
+    else:
+        df = pd.read_csv('../../error/source/val_norm.csv')
     df = processData(df)
     x = df.loc[:, feature_index]
     y = df.loc[:, 'classify']
@@ -33,7 +36,7 @@ def predictClassify(model, feature_index, model_name):
 
     return y, y_pre
 
-def predictSpecClassify(model, feature_index, model_name, spec):
+def predictSpecClassify(model, feature_index, model_name, spec, test_or_val=True):
     """
     spec模型---预测分类模型对应的准确率
     :param model: 模型
@@ -43,7 +46,10 @@ def predictSpecClassify(model, feature_index, model_name, spec):
     :return: y y_pre(top1, top2) y_pre 为2维
     """
     # 读取测试文件
-    df = pd.read_csv('../../error/source/test_norm.csv')
+    if test_or_val:
+        df = pd.read_csv('../../error/source/test_norm.csv')
+    else:
+        df = pd.read_csv('../../error/source/val_norm.csv')
     df = processDataSpec(df)
 
     x = df.loc[df['concat'] == spec, feature_index]
@@ -66,7 +72,7 @@ def predictSpecClassify(model, feature_index, model_name, spec):
 
     return y, y_pre
 
-def predictRegression(model, feature_index):
+def predictRegression(model, feature_index, test_or_val=True):
     """
     domain模型--预测回归模型准确率
     :param model: 模型
@@ -75,7 +81,10 @@ def predictRegression(model, feature_index):
     :return: y y_pre 都是一维
     """
     # 读取测试文件
-    df = pd.read_csv('../../error/source/test_norm.csv')
+    if test_or_val:
+        df = pd.read_csv('../../error/source/test_norm.csv')
+    else:
+        df = pd.read_csv('../../error/source/val_norm.csv')
     df = processData(df)
     x = df.loc[:, feature_index]
     y = df.loc[:, 'untrained_acc']
@@ -84,7 +93,7 @@ def predictRegression(model, feature_index):
 
     return y, y_pre
 
-def predictSpectRegression(model, feature_index, model_name, spec):
+def predictSpectRegression(model, feature_index, model_name, spec, test_or_val=True):
     """
     spec模型---预测回归模型准确率
     :param model: 模型
@@ -94,7 +103,10 @@ def predictSpectRegression(model, feature_index, model_name, spec):
     :return: y y_pre 都是一维
     """
     # 读取测试文件
-    df = pd.read_csv('../../error/source/test_norm.csv')
+    if test_or_val:
+        df = pd.read_csv('../../error/source/test_norm.csv')
+    else:
+        df = pd.read_csv('../../error/source/val_norm.csv')
     df = processDataSpec(df)
 
     x = df.loc[df['concat'] == spec, feature_index]

@@ -135,10 +135,10 @@ def treeRegModel():
     # 绘制树模型回归指标
     df_dt = pd.read_csv('result/csv/reg_dt_model.csv', index_col=0)
     df_dt = df_dt.rename(columns={'MAPE':r'$\text{MAPE}_{dt}$',
-                          r'$\chi^2$':r'$\chi^2_{dt}$'})
+                          r'$\chi^2$':r'$R^2_{dt}$'})
     df_rf = pd.read_csv('result/csv/reg_rf_model.csv', index_col=0)
     df_rf = df_rf.rename(columns={'MAPE': r'$\text{MAPE}_{rf}$',
-                                  r'$\chi^2$': r'$\chi^2_{rf}$'})
+                                  r'$\chi^2$': r'$R^2_{rf}$'})
     plt.style.use(['science', 'ieee'])
     df = pd.merge(df_dt, df_rf,left_index=True, right_index=True)
     for index, data in df.iteritems():
@@ -150,6 +150,7 @@ def treeRegModel():
     plt.show()
 
 def feature2latex():
+    treeRegModel()
     dt_cla_fea = ['var_RED', 'single-sided', 'var_ARED', 'mue_ED0', 'ER', 'mue_ARED', 'mue_RED', 'var_ED', 'RMS_ED', 'NMED', 'WCE']
     str2latex(dt_cla_fea)
     # rf_cla_fea = ['var_ED0', 'WCE', 'mue_ED0', 'var_RED', 'RMS_RED']
@@ -171,8 +172,8 @@ def feature2latex():
 if __name__ == '__main__':
     # dropRankCla()
     # dropRankReg()
-    wrapperClassify()
+    # wrapperClassify()
     # wrapperRegression()
-    # treeRegModel()
+    treeRegModel()
 
 

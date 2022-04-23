@@ -53,8 +53,9 @@ def sel_res():
     特征排序的结果
     :return: 两个dict res_c 分类模型特征排序结果, res_r 回归模型排序结果
     """
-    res_c = {r'$\chi^2$':['mue_ED', 'NMED', 'mue_ED0'],
-             'var':['var_ED', 'var_RED', 'mue_RED'],
+    res_c = {
+            r'$\chi^2$':['mue_ED', 'NMED', 'mue_ED0'],
+             r'$\sigma^2$':['var_ED', 'var_RED', 'mue_RED'],
              r'$mr_c$':['WCRE','WCE','mue_ED0'],
              r'$mr_{Dd}$':['single-sided', 'ER', 'zero-error'],
              r'$mr_{dq}$':['zero-error', 'single-sided', 'WCRE'],
@@ -77,7 +78,7 @@ def sel_res():
              }
     return res_c, res_r
 
-def evaluationModelClassify(feature_sel, model, model_name):
+def evaluationModelClassify(feature_sel, model, model_name, test_or_val=True):
     """
     模型的预测以及评分
     :param feature_sel: list  训练选择的特征
@@ -86,7 +87,7 @@ def evaluationModelClassify(feature_sel, model, model_name):
     :return: 模型的评价指标, list top1 top2 recall-1等
     """
 
-    y, y_pre = predict_model.predictClassify(model, feature_sel, model_name)
+    y, y_pre = predict_model.predictClassify(model, feature_sel, model_name, test_or_val)
     y = np.array(y)
     result =evaluation(y, y_pre)
 
@@ -116,10 +117,11 @@ if __name__ == '__main__':
     rf_df = pd.DataFrame(index=res_c.keys(), columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
     mlp_df = pd.DataFrame(index=res_c.keys(), columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
 
-    df_dict = {'dt': dt_df,
-               # 'svm': svm_df,
-               # 'mlp': mlp_df,
-               'rf':rf_df
+    df_dict = {
+               'dt': dt_df,
+               'svm': svm_df,
+               'rf':rf_df,
+               'mlp': mlp_df,
                }
     df = processData(df)
 
@@ -139,8 +141,9 @@ if __name__ == '__main__':
 
         for func in func_dict:
             model = func_dict[func](df, feature_sel + fixed_feature)
-            acc = evaluationModelClassify(feature_sel + fixed_feature, model, func)
+            acc = evaluationModelClassify(feature_sel + fixed_feature, model, func, True)
             df_dict[func].loc[key, :] = acc
-
+            # print(acc)
+    # print(df_dict)
     for key in func_dict:
         classifyDraw(df_dict[key], 'cla_'+key+'_sel.pdf')
