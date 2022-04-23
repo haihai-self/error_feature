@@ -8,6 +8,7 @@ from sklearn import metrics
 from evaluate import classify, regression
 from error.data_process import processDataSpec, processData
 import matplotlib.pyplot as plt
+import predict_model
 
 
 def classifyRF(df, feature_index):
@@ -135,6 +136,21 @@ def rfRegErrorModel():
         dt_df.loc[index, :] = res
     plotRF(dt_df, 'reg_rf_model')
 
+def getProb():
+    feature_sel = ['WCRE','WCE','mue_ED0']
+    fixed_feature = ['net', 'dataset', 'concat']
+    feature_sel += fixed_feature
+    df1 = pd.read_csv('../../error/source/train_norm.csv', index_col='mul_name')
+    df1 = processData(df1)
+    df2 = pd.read_csv('../../error/source/test_norm.csv', index_col='mul_name')
+
+    model = classifyRF(df1, feature_sel)
+    y, y_pre = predict_model.predictClassify(model, feature_sel, 'rf', True)
+    df2.insert(5, column='y_pre', value=y_pre[:, 0])
+    # df2.loc[:, 'y_pre'] = y_pre[:, 0]
+    df2.sort_values(by=['y_pre', 'untrained_acc'], inplace=True, ascending=[True, False])
+    df2.to_csv('../result/csv/cla_pre.csv')
 if __name__ == '__main__':
     # rfRegErrorModel()
-    rfClaErrorModel()
+    # rfClaErrorModel()
+    getProb()

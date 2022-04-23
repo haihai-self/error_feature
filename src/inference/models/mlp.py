@@ -77,7 +77,7 @@ def regressionMLP(df, feature_sel):
         loss=keras.losses.mean_absolute_percentage_error,
         optimizer=keras.optimizers.Adam(1e-3),
         metrics=[keras.metrics.mean_absolute_percentage_error])
-    model.fit(train_dataset, epochs=200, verbose=2)
+    model.fit(train_dataset, epochs=400, verbose=2)
 
     return model
 
@@ -133,8 +133,24 @@ def mlpClaErrorModel():
         dt_df.loc[index, :] = res
     plotMLP(dt_df, 'cla_mlp_model')
 
+def getProb():
+    feature_sel = ['mue_ED0', 'mue_ED', 'ER']
+    fixed_feature = ['net', 'dataset', 'concat']
+    feature_sel += fixed_feature
+    df1 = pd.read_csv('../../error/source/train_norm.csv', index_col='mul_name')
+    df1 = processData(df1)
+    df2 = pd.read_csv('../../error/source/test_norm.csv', index_col='mul_name')
+
+    model = regressionMLP(df1, feature_sel)
+    y, y_pre = predict_model.predictRegression(model, feature_sel, True)
+    df2.insert(0, column='y_pre', value=y_pre)
+    # df2.loc[:, 'y_pre'] = y_pre[:, 0]
+    df2.sort_values(by=['classify', 'y_pre', 'untrained_acc'], inplace=True, ascending=[True, False, False])
+    df2.to_csv('../result/csv/reg_pre.csv')
+
 if __name__ == '__main__':
-    mlpClaErrorModel()
+    # mlpClaErrorModel()
+    getProb()
     # df = pd.read_csv('../../error/source/train_norm.csv')
     # df = processData(df)
     # sel_feature = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED', 'mue_ARED', 'var_ARED',
