@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
 
 def densPlot(df, loc, label_loc):
@@ -16,7 +17,7 @@ def densPlot(df, loc, label_loc):
     fig.show()
     fig.savefig(loc, bbox_inches='tight')
 
-if __name__ == '__main__':
+def normDataset():
     df = pd.read_csv("source/err.csv", index_col='mul_name')
     df_acc = pd.read_csv('source/untrained_acc.csv', index_col='mul_name')
     df = pd.merge(df, df_acc, on='mul_name')
@@ -45,7 +46,8 @@ if __name__ == '__main__':
                 des.loc['73%', index] - des.loc['min', index])
 
         # 不设置最大值归一化
-        df_train_not_max.loc[:, index] = (df_train_not_max.loc[:, index] - des.loc['min', index]) / (des.loc['max', index] - des.loc['min', index])
+        df_train_not_max.loc[:, index] = (df_train_not_max.loc[:, index] - des.loc['min', index]) / (
+                    des.loc['max', index] - des.loc['min', index])
 
         # 设置测试集
         df_test.loc[df_test.loc[:, index] >= des.loc['73%', index], index] = des.loc['73%', index]
@@ -64,4 +66,46 @@ if __name__ == '__main__':
 
     # densPlot(df_train_set_max, './result/density_setmax.pdf', 'upper left')
     # densPlot(df_train_not_max, './result/density_nomax.pdf', 'upper right')
+
+def getRetrain():
+    target_dir = ['vgg16_cifar10_origin_app', 'vgg16_mnist_origin_app']
+    retrain_path  = '../../result/retrain'
+    df = pd.DataFrame(columns=['mul_name', 'trained_acc', 'net', 'dataset', 'concat'])
+
+    # 读取应用文件夹
+    for app in target_dir:
+        app_path = retrain_path + '/' + app
+        temp = app.strip().split('_')
+        net_name = temp[0]
+        dataset_name = temp[1]
+        concat_name = net_name+dataset_name
+
+        method_dirs = os.listdir(app_path)
+
+        # 读取近似计算方法文件夹
+        for method_dir in method_dirs:
+            method_path = app_path + '/' + method_dir
+            mul_dirs = os.listdir(method_path)
+            # 读取乘法器文件夹
+            for mul_dir in mul_dirs:
+                mul_path = method_path + '/' + mul_dir
+                acc_path = mul_path + '/acc.log'
+                mul_name = mul_dir.split('.')[0]
+                # 读取每个AM的准确率
+                with open(acc_path, 'r') as f:
+                    acc = f.readline().strip().split(' ')[3]
+                    new_col = {'mul_name':mul_name, 'trained_acc':acc, 'net':net_name, 'dataset':dataset_name, 'concat':concat_name}
+                    new_col = new_col.values()
+                    row_len = df.shape[0]
+                    # 添加新数据到df
+                    df.loc[row_len] = new_col
+    # 保存csv
+    df.to_csv('source/retrain.csv', index=False)
+
+
+
+
+
+if __name__ == '__main__':
+    getRetrain()
 
