@@ -2,15 +2,13 @@ from sklearn import svm
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import GridSearchCV
-from evaluate import classify, regression
 from sklearn import metrics
 import matplotlib.pyplot as plt
 import sys
 
 sys.path.append('..')
-from models.predict_model import predictClassify, predictSpecClassify, predictRegression, predictSpectRegression
 from error.data_process import processDataSpec, processData
-from evaluate import classify, regression
+from evaluate import regression
 
 
 def classifySVM(df, feature_index):
@@ -154,53 +152,53 @@ def regressionSVMSigmoid(df, feature_index):
     return model_sigmoid
 
 
-def plotSVM(df, savename):
-    """
-    绘制df数据折线图
-    :param df: DataFrame 数据结构，
-    :param savename:保存pdf的文件名
-    """
-    plt.style.use(['science', 'ieee'])
-    # df = df.sort_values(by='mape', ascending=True)
-    df.to_csv('../result/csv/' + savename + '.csv')
-    for index, data in df.iteritems():
-        plt.plot(df.index, data.values, label=index)
-    # plt.legend(label)
-    plt.legend(loc='best')
-    plt.xticks(rotation=300)
-
-    plt.savefig('../result/' + savename + '.pdf', bbox_inches='tight')
-    # plt.show()
-
-
-def svmClaErrorModel():
-    # 训练svm分类误差模型，并且绘制对应指标图
-    df = pd.read_csv('../../error/source/train_norm.csv')
-    df = processDataSpec(df)
-    # feature_index = ['WCRE', 'WCE', 'mue_ED0']
-    feature_index = ['mue_ED0', 'mue_ED', 'ER']
-    # feature_index = ['var_ED', 'var_RED', 'mue_RED']
-
-    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
-               'resnet34cifar', 'resnet34cifar100']
-    dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
-
-    for index in indexes:
-        if index == 'domain':
-            fixed_feature = ['net', 'dataset', 'concat']
-            df_train = processData(df)
-            model = classifySVM(df_train, feature_index + fixed_feature)
-            y, y_pre = predictClassify(model, feature_index + fixed_feature, 'svm')
-
-        else:
-
-            df_train = df[df['concat'] == index]
-
-            model = classifySVM(df_train, feature_index)
-            y, y_pre = predictSpecClassify(model, feature_index, 'svm', index)
-        res = classify.evaluation(y, y_pre)
-        dt_df.loc[index, :] = res
-    plotSVM(dt_df, 'cla_svm_model')
+# def plotSVM(df, savename):
+#     """
+#     绘制df数据折线图
+#     :param df: DataFrame 数据结构，
+#     :param savename:保存pdf的文件名
+#     """
+#     plt.style.use(['science', 'ieee'])
+#     # df = df.sort_values(by='mape', ascending=True)
+#     df.to_csv('../result/csv/' + savename + '.csv')
+#     for index, data in df.iteritems():
+#         plt.plot(df.index, data.values, label=index)
+#     # plt.legend(label)
+#     plt.legend(loc='best')
+#     plt.xticks(rotation=300)
+#
+#     plt.savefig('../result/' + savename + '.pdf', bbox_inches='tight')
+#     # plt.show()
+#
+#
+# def svmClaErrorModel():
+#     # 训练svm分类误差模型，并且绘制对应指标图
+#     df = pd.read_csv('../../error/source/train_norm.csv')
+#     df = processDataSpec(df)
+#     # feature_index = ['WCRE', 'WCE', 'mue_ED0']
+#     feature_index = ['mue_ED0', 'mue_ED', 'ER']
+#     # feature_index = ['var_ED', 'var_RED', 'mue_RED']
+#
+#     indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
+#                'resnet34cifar', 'resnet34cifar100']
+#     dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
+#
+#     for index in indexes:
+#         if index == 'domain':
+#             fixed_feature = ['net', 'dataset', 'concat']
+#             df_train = processData(df)
+#             model = classifySVM(df_train, feature_index + fixed_feature)
+#             y, y_pre = predictClassify(model, feature_index + fixed_feature, 'svm')
+#
+#         else:
+#
+#             df_train = df[df['concat'] == index]
+#
+#             model = classifySVM(df_train, feature_index)
+#             y, y_pre = predictClassify(model, feature_index, 'svm', index)
+#         res = classify.evaluation(y, y_pre)
+#         dt_df.loc[index, :] = res
+#     plotSVM(dt_df, 'cla_svm_model')
 
 
 if __name__ == '__main__':

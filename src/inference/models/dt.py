@@ -39,25 +39,6 @@ def regressionDecisionTree(df, feature_index):
 
     return tree_model
 
-def plotDT(df, savename):
-    """
-    绘制模型对应的指标图
-    :param df: plot data DataFrame数据结构
-    :param savename: 保存的名字, str
-    :return:
-    """
-    plt.style.use(['science', 'ieee'])
-    # df = df.sort_values(by='mape', ascending=True)
-    df.to_csv('../result/csv/' + savename + '.csv')
-    for index, data in df.iteritems():
-        plt.plot(df.index, data.values, label=index)
-    # plt.legend(label)
-    plt.legend(loc='best')
-    plt.xticks(rotation=300)
-
-    plt.savefig('../result/' + savename + '.pdf', bbox_inches='tight')
-    plt.show()
-
 
 def buildErrorModel():
     df_train = pd.read_csv('../../error/source/train_norm.csv')

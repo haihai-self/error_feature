@@ -55,47 +55,6 @@ def regressionRF(df, feature_index):
 
 
 
-def plotRF(df, savename):
-    """
-    绘制df数据折线图
-    :param df: DataFrame 数据结构，
-    :param savename:保存pdf的文件名
-    """
-    plt.style.use(['science', 'ieee'])
-    df.to_csv('../result/csv/' + savename + '.csv')
-
-    for index, data in df.iteritems():
-        plt.plot(df.index, data.values, label=index)
-    plt.legend(loc='best')
-    plt.xticks(rotation=300)
-
-    plt.savefig('../result/' + savename + '.pdf', bbox_inches='tight')
-    plt.show()
-
-
-
-# def getProb():
-#     """
-#     得到预测文件值
-#     :return:
-#     """
-#     feature_sel = ['WCRE','WCE','mue_ED0']
-#     fixed_feature = ['net', 'dataset', 'concat']
-#     feature_sel += fixed_feature
-#     df1 = pd.read_csv('../../error/source/train_norm.csv', index_col='mul_name')
-#     df1 = processData(df1)
-#     df2 = pd.read_csv('../../error/source/test_norm.csv', index_col='mul_name')
-#
-#     model = classifyRF(df1, feature_sel)
-#     y, y_pre = predict_model.predictClassify(model, feature_sel, 'rf', True)
-#     df2.insert(5, column='y_pre', value=y_pre[:, 0])
-#     # df2.loc[:, 'y_pre'] = y_pre[:, 0]
-#     df2.sort_values(by=['y_pre', 'untrained_acc'], inplace=True, ascending=[True, False])
-#     df2.to_csv('../result/csv/cla_pre.csv')
-#
-
-
-
 def buildErrorModel():
     df_train = pd.read_csv('../../error/source/train_norm.csv')
     df_test = pd.read_csv('../../error/source/test_norm.csv')

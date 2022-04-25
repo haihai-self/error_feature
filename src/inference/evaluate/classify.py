@@ -4,7 +4,8 @@ import sys
 sys.path.append('..')
 from error.data_process import processData
 import numpy as np
-from models import svm, dt, rf, predict_model, mlp
+from models import svm, dt, rf, mlp
+from models.predict_model import predictClassify
 import matplotlib.pyplot as plt
 
 
@@ -87,7 +88,7 @@ def evaluationModelClassify(feature_sel, model, model_name, test_or_val=True):
     :return: 模型的评价指标, list top1 top2 recall-1等
     """
 
-    y, y_pre = predict_model.predictClassify(model, feature_sel, model_name, test_or_val)
+    y, y_pre = predictClassify(model, feature_sel, model_name, test_or_val)
     y = np.array(y)
     result =evaluation(y, y_pre)
 
@@ -143,7 +144,5 @@ if __name__ == '__main__':
             model = func_dict[func](df, feature_sel + fixed_feature)
             acc = evaluationModelClassify(feature_sel + fixed_feature, model, func, True)
             df_dict[func].loc[key, :] = acc
-            # print(acc)
-    # print(df_dict)
     for key in func_dict:
         classifyDraw(df_dict[key], 'cla_'+key+'_sel.pdf')

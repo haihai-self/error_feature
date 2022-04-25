@@ -11,8 +11,7 @@ import sys
 sys.path.append('../')
 from models import predict_model
 from error.data_process import processDataSpec, processData
-from evaluate import classify, regression
-from models.predict_model import predictClassify, predictSpecClassify, predictRegression, predictSpectRegression
+from models.predict_model import predictClassify, predictRegression, predictSpectRegression
 import matplotlib.pyplot as plt
 
 
@@ -101,52 +100,52 @@ def plotMLP(df, savename):
     plt.show()
 
 
-def mlpClaErrorModel():
-    """
-    mlp分类模型
-    :return: 绘制分类对应指标图
-    """
-    df = pd.read_csv('../../error/source/train_norm.csv')
-    df = processDataSpec(df)
-    # feature_index = ['WCRE', 'WCE', 'mue_ED0']
-    feature_index = ['mue_ED0', 'mue_ED', 'ER']
-    # feature_index = ['var_ED', 'var_RED', 'mue_RED']
-
-    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
-               'resnet34cifar', 'resnet34cifar100']
-    dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
-
-    for index in indexes:
-        if index == 'domain':
-            fixed_feature = ['net', 'dataset', 'concat']
-            df_train = processData(df)
-            model = classifyMLP(df_train, feature_index + fixed_feature)
-            y, y_pre = predictClassify(model, feature_index + fixed_feature, 'mlp')
-
-        else:
-
-            df_train = df[df['concat'] == index]
-
-            model = classifyMLP(df_train, feature_index)
-            y, y_pre = predictSpecClassify(model, feature_index, 'mlp', index)
-        res = classify.evaluation(y, y_pre)
-        dt_df.loc[index, :] = res
-    plotMLP(dt_df, 'cla_mlp_model')
-
-def getProb():
-    feature_sel = ['mue_ED0', 'mue_ED', 'ER']
-    fixed_feature = ['net', 'dataset', 'concat']
-    feature_sel += fixed_feature
-    df1 = pd.read_csv('../../error/source/train_norm.csv', index_col='mul_name')
-    df1 = processData(df1)
-    df2 = pd.read_csv('../../error/source/test_norm.csv', index_col='mul_name')
-
-    model = regressionMLP(df1, feature_sel)
-    y, y_pre = predict_model.predictRegression(model, feature_sel, True)
-    df2.insert(0, column='y_pre', value=y_pre)
-    # df2.loc[:, 'y_pre'] = y_pre[:, 0]
-    df2.sort_values(by=['classify', 'y_pre', 'untrained_acc'], inplace=True, ascending=[True, False, False])
-    df2.to_csv('../result/csv/reg_pre.csv')
+# def mlpClaErrorModel():
+#     """
+#     mlp分类模型
+#     :return: 绘制分类对应指标图
+#     """
+#     df = pd.read_csv('../../error/source/train_norm.csv')
+#     df = processDataSpec(df)
+#     # feature_index = ['WCRE', 'WCE', 'mue_ED0']
+#     feature_index = ['mue_ED0', 'mue_ED', 'ER']
+#     # feature_index = ['var_ED', 'var_RED', 'mue_RED']
+#
+#     indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
+#                'resnet34cifar', 'resnet34cifar100']
+#     dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
+#
+#     for index in indexes:
+#         if index == 'domain':
+#             fixed_feature = ['net', 'dataset', 'concat']
+#             df_train = processData(df)
+#             model = classifyMLP(df_train, feature_index + fixed_feature)
+#             y, y_pre = predictClassify(model, feature_index + fixed_feature, 'mlp')
+#
+#         else:
+#
+#             df_train = df[df['concat'] == index]
+#
+#             model = classifyMLP(df_train, feature_index)
+#             y, y_pre = predictClassify(model, feature_index, 'mlp', index)
+#         res = classify.evaluation(y, y_pre)
+#         dt_df.loc[index, :] = res
+#     plotMLP(dt_df, 'cla_mlp_model')
+#
+# def getProb():
+#     feature_sel = ['mue_ED0', 'mue_ED', 'ER']
+#     fixed_feature = ['net', 'dataset', 'concat']
+#     feature_sel += fixed_feature
+#     df1 = pd.read_csv('../../error/source/train_norm.csv', index_col='mul_name')
+#     df1 = processData(df1)
+#     df2 = pd.read_csv('../../error/source/test_norm.csv', index_col='mul_name')
+#
+#     model = regressionMLP(df1, feature_sel)
+#     y, y_pre = predict_model.predictRegression(model, feature_sel, True)
+#     df2.insert(0, column='y_pre', value=y_pre)
+#     # df2.loc[:, 'y_pre'] = y_pre[:, 0]
+#     df2.sort_values(by=['classify', 'y_pre', 'untrained_acc'], inplace=True, ascending=[True, False, False])
+#     df2.to_csv('../result/csv/reg_pre.csv')
 
 if __name__ == '__main__':
     # mlpClaErrorModel()
