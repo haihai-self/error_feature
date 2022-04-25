@@ -196,6 +196,8 @@ def threshold(df):
     for i in [2, 1, 0]:
         x = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[0]]
         y = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[1]]
+        x = np.log(x+1)
+        y = np.log(y+1)
 
         z = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[2]]
 
@@ -203,10 +205,15 @@ def threshold(df):
     ax.set_ylabel(r'$\mu_{ED}$')
     ax.set_xlabel(r'$\mu_E$')
     ax.set_zlabel(r'$ER$')
+    # ax.view_init(10, 150)
 
-    plt.legend(loc=[.4, .2])
+    # plt.legend(loc=[.55, .1])
+    # plt.savefig('result/threshold_3d_r.pdf')
+
+    plt.legend(loc=[.55, .1])
     plt.savefig('result/threshold_3d_i.pdf')
-    plt.show()
+
+    # plt.show()
     plt.close()
 
 
@@ -221,28 +228,46 @@ def threshold2d(df):
     edge_c = ['black', 'red', 'g']
     fig, ax = plt.subplots(1, 1)
     for i in [2, 1, 0]:
-        x = df_plt.loc[(df.loc[:, 'classify'] == i) & ((df.loc[:, 'mue_ED0']) < 150), feature_sel[0]]
+        x = df_plt.loc[(df.loc[:, 'classify'] == i) & ((df.loc[:, 'mue_ED0']) < 2000), feature_sel[0]]
         y = df_plt.loc[(x.index), feature_sel[1]]
+        x = np.log2(x+1)
+        y = np.log2(y+1)
 
         # z = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[2]]
 
-        ax.scatter(x, y, label='class%d' % (i), alpha=0.9, edgecolors=edge_c[i], marker=marker[i], c='w', lw=1)
+        ax.scatter(x, y, label='class%d' % (i), alpha=0.9, edgecolors=edge_c[i], marker=marker[i], c='w', lw=1, s=20)
     plt.ylabel(r'$\mu_{ED}$')
     plt.xlabel(r'$\mu_E$')
-    plt.legend()
-    axins = ax.inset_axes((.1, .65, .3, .3))
-    #
-    # y_list = []
-    for i in [0, 1, 2]:
-        y = df_plt.loc[(df.loc[:, 'classify'] == i) & ((df.loc[:, 'mue_ED']) < 10.5), feature_sel[1]]
-        x = df_plt.loc[(y.index), feature_sel[0]]
-        # z = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[2]]
+    plt.legend(loc='lower right')
 
-        axins.scatter(x, y, alpha=0.9, edgecolors=edge_c[i], marker=marker[i], c='w')
+    # plt inference
+    # axins = ax.inset_axes((.44, .1, .25, .25))
+    # for i in [0, 1, 2]:
+    #     y = df_plt.loc[
+    #         (df.loc[:, 'classify'] == i) & ((df.loc[:, 'mue_ED'] < 10.5) & (df.loc[:, 'mue_ED'] > 8)), feature_sel[1]]
+    #     x = df_plt.loc[(y.index), feature_sel[0]]
+    #     x = np.log2(x+1)
+    #     y = np.log2(y+1)
+    #     axins.scatter(x, y, alpha=0.8, edgecolors=edge_c[i], marker=marker[i], c='w', s=20)
+    #     if i == 2:
+    #         axins.text(x - 0.4, y + 0.08, s='(' + '%.1f' % x.values[0] + ',' + '%.1f' % y.values[0] + ')', size=7)
+    # mark_inset(ax, axins, loc1=3, loc2=2, fc="none", ec='k', lw=1, linestyle='--')
+    # plt.savefig('result/threshold_2d_i.pdf')
+    # plt.close()
+
+
+    # plt retrain
+    axins = ax.inset_axes((.45, .1, .25, .25))
+    for i in [0, 1, 2]:
+        y = df_plt.loc[(df.loc[:, 'classify'] == i) & ((df.loc[:, 'mue_ED'] < 31) & (df.loc[:, 'mue_ED'] > 25)), feature_sel[1]]
+        x = df_plt.loc[(y.index), feature_sel[0]]
+        x = np.log2(x)
+        y = np.log2(y)
+        axins.scatter(x, y, alpha=0.8, edgecolors=edge_c[i], marker=marker[i], c='w', s=20)
         if i == 2:
-            axins.text(x - 3, y - 5, s='(' + '%.1f' % x.values[0] + ',' + '%.1f' % y.values[0] + ')', size=7)
-    mark_inset(ax, axins, loc1=3, loc2=4, fc="none", ec='k', lw=1, linestyle='--')
-    plt.savefig('result/threshold_2d_i.pdf')
+            axins.text(x-0.5 , y+0.03 , s='(' + '%.1f' % x.values[0] + ',' + '%.1f' % y.values[0] + ')', size=7)
+    mark_inset(ax, axins, loc1=3, loc2=1, fc="none", ec='k', lw=1, linestyle='--')
+    plt.savefig('result/threshold_2d_r.pdf')
     plt.close()
 
 
