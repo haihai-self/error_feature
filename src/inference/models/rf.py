@@ -3,12 +3,10 @@ from sklearn.model_selection import GridSearchCV
 import pandas as pd
 import sys
 sys.path.append('..')
-from models.predict_model import predictClassify, predictSpecClassify, predictRegression, predictSpectRegression
-from sklearn import metrics
-from evaluate import classify, regression
-from error.data_process import processDataSpec, processData
+sys.path.append('../../')
 import matplotlib.pyplot as plt
 import predict_model
+from evaluate import classify, regression
 
 
 def classifyRF(df, feature_index):
@@ -30,7 +28,7 @@ def classifyRF(df, feature_index):
     model = RandomForestClassifier(n_estimators=n_estimators, oob_score=True, random_state=10)
     # model = RandomForestClassifier(n_estimators=, oob_score=True, random_state=10)
     model.fit(x, y)
-    print(model.get_params())
+    # print(model.get_params())
     # model.max_depth
     return model
 
@@ -64,93 +62,68 @@ def plotRF(df, savename):
     :param savename:保存pdf的文件名
     """
     plt.style.use(['science', 'ieee'])
-    # df = df.sort_values(by='mape', ascending=True)
     df.to_csv('../result/csv/' + savename + '.csv')
 
     for index, data in df.iteritems():
         plt.plot(df.index, data.values, label=index)
-    # plt.legend(label)
     plt.legend(loc='best')
     plt.xticks(rotation=300)
 
     plt.savefig('../result/' + savename + '.pdf', bbox_inches='tight')
     plt.show()
 
-def rfClaErrorModel():
-    """
-    分类误差模型，训练并绘制模型指标
-    :return:
-    """
-    df = pd.read_csv('../../error/source/train_norm.csv')
-    df = processDataSpec(df)
-    feature_index = ['WCRE', 'WCE', 'mue_ED0']
 
+
+# def getProb():
+#     """
+#     得到预测文件值
+#     :return:
+#     """
+#     feature_sel = ['WCRE','WCE','mue_ED0']
+#     fixed_feature = ['net', 'dataset', 'concat']
+#     feature_sel += fixed_feature
+#     df1 = pd.read_csv('../../error/source/train_norm.csv', index_col='mul_name')
+#     df1 = processData(df1)
+#     df2 = pd.read_csv('../../error/source/test_norm.csv', index_col='mul_name')
+#
+#     model = classifyRF(df1, feature_sel)
+#     y, y_pre = predict_model.predictClassify(model, feature_sel, 'rf', True)
+#     df2.insert(5, column='y_pre', value=y_pre[:, 0])
+#     # df2.loc[:, 'y_pre'] = y_pre[:, 0]
+#     df2.sort_values(by=['y_pre', 'untrained_acc'], inplace=True, ascending=[True, False])
+#     df2.to_csv('../result/csv/cla_pre.csv')
+#
+
+
+
+def buildErrorModel():
+    df_train = pd.read_csv('../../error/source/train_norm.csv')
+    df_test = pd.read_csv('../../error/source/test_norm.csv')
+
+    # 构建分类误差模型
+    feature_index = ['WCRE', 'WCE', 'mue_ED0']
+    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist',  'resnet18cifar', 'vgg16cifar',
+               'resnet34cifar', 'resnet34cifar100']
+    dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
+    predict_model.claErrorModel(df_train, df_test, feature_index, indexes, classifyRF, 'rf', dt_df, 'cla_rf_model')
+
+    # 构建回归误差模型
+    feature_index = ['var_ED', 'var_RED', 'mue_RED']
+    dt_df = pd.DataFrame(index=indexes, columns=['MAPE', r'$\chi^2$'])
+    predict_model.regErrorModel(df_train, df_test, feature_index, indexes, regressionRF, 'rf', dt_df, 'reg_rf_model')
+
+    # 构建retrain分类误差模型
+    df_train = pd.read_csv('../../error/source/train_norm.csv')
+    df_test = pd.read_csv('../../error/source/test_norm.csv')
+
+
+    feature_index = ['WCRE', 'WCE', 'mue_ED0']
     indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist',  'resnet18cifar', 'vgg16cifar',
                'resnet34cifar', 'resnet34cifar100']
     dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
 
-    for index in indexes:
-        if index == 'domain':
-            fixed_feature = ['net', 'dataset', 'concat']
-            df_train = processData(df)
-            model = classifyRF(df_train, feature_index + fixed_feature)
-            y, y_pre = predictClassify(model, feature_index + fixed_feature, index)
-
-        else:
-
-            df_train = df[df['concat'] == index]
-
-            model = classifyRF(df_train, feature_index)
-            y, y_pre = predictSpecClassify(model, feature_index, 'dt', index)
-        res = classify.evaluation(y, y_pre)
-        dt_df.loc[index, :] = res
-    plotRF(dt_df, 'cla_rf_model')
-
-def rfRegErrorModel():
-    """
-    回归误差模型，训练并绘制指标
-    :return:
-    """
-    df = pd.read_csv('../../error/source/train_norm.csv')
-    df = processDataSpec(df)
-    feature_index = ['var_ED', 'var_RED', 'mue_RED']
-
-    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
-               'resnet34cifar', 'resnet34cifar100']
-    dt_df = pd.DataFrame(index=indexes, columns=['MAPE', r'$\chi^2$'])
-
-    for index in indexes:
-        if index == 'domain':
-            fixed_feature = ['net', 'dataset', 'concat']
-            df_train = processData(df)
-            model = regressionRF(df_train, feature_index + fixed_feature)
-            y, y_pre = predictRegression(model, feature_index + fixed_feature)
-
-        else:
-
-            df_train = df[df['concat'] == index]
-
-            model = regressionRF(df_train, feature_index)
-            y, y_pre = predictSpectRegression(model, feature_index, 'dt', index)
-        res = regression.evaluation(y, y_pre)
-        dt_df.loc[index, :] = res
-    plotRF(dt_df, 'reg_rf_model')
-
-def getProb():
-    feature_sel = ['WCRE','WCE','mue_ED0']
-    fixed_feature = ['net', 'dataset', 'concat']
-    feature_sel += fixed_feature
-    df1 = pd.read_csv('../../error/source/train_norm.csv', index_col='mul_name')
-    df1 = processData(df1)
-    df2 = pd.read_csv('../../error/source/test_norm.csv', index_col='mul_name')
-
-    model = classifyRF(df1, feature_sel)
-    y, y_pre = predict_model.predictClassify(model, feature_sel, 'rf', True)
-    df2.insert(5, column='y_pre', value=y_pre[:, 0])
-    # df2.loc[:, 'y_pre'] = y_pre[:, 0]
-    df2.sort_values(by=['y_pre', 'untrained_acc'], inplace=True, ascending=[True, False])
-    df2.to_csv('../result/csv/cla_pre.csv')
 if __name__ == '__main__':
+    buildErrorModel()
     # rfRegErrorModel()
-    # rfClaErrorModel()
-    getProb()
+    # getProb()
+    # classifyRetrainRF()
