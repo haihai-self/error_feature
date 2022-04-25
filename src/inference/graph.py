@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from mpl_toolkits import mplot3d
+from matplotlib.patches import ConnectionPatch
+from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 
 
 def feature2latex():
@@ -23,16 +25,20 @@ def feature2latex():
     # str2latex(svm_reg_fea)
     # mlp_reg_fea = ['ER', 'mue_ED0', 'zero-error', 'NMED', 'mue_ED', 'var_ARED', 'single-sided', 'var_RED', 'WCRE', 'RMS_RED', 'WCE', 'mue_ARED', 'RMS_ED', 'var_ED']
     # str2latex(mlp_reg_fea)
+
+
 def str2latex(list):
     # 将str名称修改成latex格式打印出来
     latex_dict = {'mue_ED0': r'$\mu_E$', 'var_ED0': r'$\sigma_E$', 'mue_ED': r'$\mu_{ED}$', 'NMED': r'$NMED$',
-                       'var_ED': r'$\sigma_{ED}$', 'mue_RED': r'$\mu_{RE}$', 'var_RED': r'$\sigma_{RE}$',
-                       'mue_ARED': r'$\mu_{RED}$', 'var_ARED': r'$\sigma_{RED}$', 'RMS_ED': r'$rms_E$ ',
-                       'RMS_RED': r'$rms_{RE}$', 'ER': r'$ER$', 'WCE': r'$W_E$', 'WCRE': r'$W_{RE}$', 'single-sided':r'$E_{ss}$', 'zero-error':r'$E_{zo}$'
-                       }
+                  'var_ED': r'$\sigma_{ED}$', 'mue_RED': r'$\mu_{RE}$', 'var_RED': r'$\sigma_{RE}$',
+                  'mue_ARED': r'$\mu_{RED}$', 'var_ARED': r'$\sigma_{RED}$', 'RMS_ED': r'$rms_E$ ',
+                  'RMS_RED': r'$rms_{RE}$', 'ER': r'$ER$', 'WCE': r'$W_E$', 'WCRE': r'$W_{RE}$',
+                  'single-sided': r'$E_{ss}$', 'zero-error': r'$E_{zo}$'
+                  }
     for i in list:
         print(latex_dict[i], end=', ')
     print()
+
 
 def wrapperClassify():
     # 得到lvm方法分类模型对应的指标
@@ -58,6 +64,7 @@ def wrapperClassify():
     plt.savefig('result/lvm_sel.pdf', bbox_inches='tight')
     plt.show()
     plt.close()
+
 
 def wrapperRegression():
     # 得到lvm方法回归模型对应的指
@@ -97,6 +104,7 @@ def wrapperRegression():
     # plt.show()
     plt.close()
 
+
 def dropRankCla():
     # 绘制droprank得到的特征重要性排序图--分类模型
     df = pd.read_csv('result/drop.csv')
@@ -124,6 +132,7 @@ def dropRankCla():
     plt.savefig('result/drop_rank_cla.pdf', bbox_inches='tight')
     # plt.show()
     plt.close()
+
 
 def dropRankReg():
     # 绘制droprank得到的特征重要性排序图--回归模型
@@ -153,16 +162,17 @@ def dropRankReg():
     # plt.show()
     plt.close()
 
+
 def treeRegModel():
     # 绘制树模型回归指标
     df_dt = pd.read_csv('result/csv/reg_dt_model.csv', index_col=0)
-    df_dt = df_dt.rename(columns={'MAPE':r'$\text{MAPE}_{dt}$',
-                          r'$\chi^2$':r'$R^2_{dt}$'})
+    df_dt = df_dt.rename(columns={'MAPE': r'$\text{MAPE}_{dt}$',
+                                  r'$\chi^2$': r'$R^2_{dt}$'})
     df_rf = pd.read_csv('result/csv/reg_rf_model.csv', index_col=0)
     df_rf = df_rf.rename(columns={'MAPE': r'$\text{MAPE}_{rf}$',
                                   r'$\chi^2$': r'$R^2_{rf}$'})
     plt.style.use(['science', 'ieee'])
-    df = pd.merge(df_dt, df_rf,left_index=True, right_index=True)
+    df = pd.merge(df_dt, df_rf, left_index=True, right_index=True)
     for index, data in df.iteritems():
         plt.plot(df.index, data.values, label=index)
     # plt.legend(label)
@@ -172,32 +182,68 @@ def treeRegModel():
     plt.show()
 
 
-
 def threshold(df):
     df_plt = df[df['concat'] == 'vgg16cifar']
     df_plt.sort_values(by='mue_ED0')
 
-    plt.style.use(['science','ieee'])
+    plt.style.use(['science', 'ieee'])
     ax = plt.axes(projection='3d')
     feature_sel = ['mue_ED0', 'mue_ED', 'ER']
 
-    marker = ['o', 'x', 'v']
-    for i in range(2):
+    marker = ['o', 'X', 'v']
+    edge_c = ['black', 'red', 'g']
+
+    for i in [2, 1, 0]:
         x = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[0]]
         y = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[1]]
 
         z = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[2]]
 
-        ax.scatter3D(x, y, z, s=4, label='class%d'%(i), marker=marker[i])
-    ax.set_xlabel(r'$\mu_{ED}$')
-    ax.set_ylabel(r'$\mu_E$')
-    ax.set_zlabel(r'$RE$')
+        ax.scatter3D(x, y, z, label='class%d' % (i), alpha=0.9, edgecolors=edge_c[i], marker=marker[i], c='w')
+    ax.set_ylabel(r'$\mu_{ED}$')
+    ax.set_xlabel(r'$\mu_E$')
+    ax.set_zlabel(r'$ER$')
 
-    plt.legend()
-    plt.savefig('result/threshold.pdf')
+    plt.legend(loc=[.4, .2])
+    plt.savefig('result/threshold_3d_i.pdf')
     plt.show()
+    plt.close()
 
 
+def threshold2d(df):
+    df_plt = df[df['concat'] == 'vgg16cifar']
+    # df_plt.sort_values(by='mue_ED', inplace=True)
+
+    plt.style.use(['science', 'ieee'])
+    feature_sel = ['mue_ED0', 'mue_ED', 'ER']
+
+    marker = ['o', '^', 'v']
+    edge_c = ['black', 'red', 'g']
+    fig, ax = plt.subplots(1, 1)
+    for i in [2, 1, 0]:
+        x = df_plt.loc[(df.loc[:, 'classify'] == i) & ((df.loc[:, 'mue_ED0']) < 150), feature_sel[0]]
+        y = df_plt.loc[(x.index), feature_sel[1]]
+
+        # z = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[2]]
+
+        ax.scatter(x, y, label='class%d' % (i), alpha=0.9, edgecolors=edge_c[i], marker=marker[i], c='w', lw=1)
+    plt.ylabel(r'$\mu_{ED}$')
+    plt.xlabel(r'$\mu_E$')
+    plt.legend()
+    axins = ax.inset_axes((.1, .65, .3, .3))
+    #
+    # y_list = []
+    for i in [0, 1, 2]:
+        y = df_plt.loc[(df.loc[:, 'classify'] == i) & ((df.loc[:, 'mue_ED']) < 10.5), feature_sel[1]]
+        x = df_plt.loc[(y.index), feature_sel[0]]
+        # z = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[2]]
+
+        axins.scatter(x, y, alpha=0.9, edgecolors=edge_c[i], marker=marker[i], c='w')
+        if i == 2:
+            axins.text(x - 3, y - 5, s='(' + '%.1f' % x.values[0] + ',' + '%.1f' % y.values[0] + ')', size=7)
+    mark_inset(ax, axins, loc1=3, loc2=4, fc="none", ec='k', lw=1, linestyle='--')
+    plt.savefig('result/threshold_2d_i.pdf')
+    plt.close()
 
 
 if __name__ == '__main__':
@@ -209,6 +255,5 @@ if __name__ == '__main__':
     # df = pd.read_csv('../error/source/retrain_dataset.csv')
     df = pd.read_csv('../error/source/dataset.csv')
 
+    # threshold2d(df)
     threshold(df)
-
-
