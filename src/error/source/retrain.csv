@@ -1,4 +1,4 @@
-mul_name,trained_acc,net,dataset,concat
+mul_name,retrained_acc,net,dataset,concat
 ReFAM_sta4_j8_k1_const1,0.10000000149011612,vgg16,cifar10,vgg16cifar10
 ReFAM_sta3_j3_k7_const1,0.10000000149011612,vgg16,cifar10,vgg16cifar10
 ReFAM_sta1_j6_k4_const0,0.10000000149011612,vgg16,cifar10,vgg16cifar10
