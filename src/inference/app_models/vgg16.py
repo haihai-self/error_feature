@@ -5,7 +5,7 @@ from tensorflow.keras import regularizers, Sequential, optimizers, layers
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 from tensorflow.keras.callbacks import LearningRateScheduler, ReduceLROnPlateau, EarlyStopping, TensorBoard
 from tensorflow.keras.utils import plot_model
-import loaddata
+from dataset import loaddata
 import numpy as np
 import tensorflow.keras.applications
 import sys
@@ -79,13 +79,12 @@ if __name__ == '__main__':
     # image_gen.fit(x_train)
 
     name = "vgg16"
-    log_dir = "logstest/" + name + "/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    # log_dir = "logstest/" + name + "/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     # tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
     # early_stop = EarlyStopping(monitor='val_loss', min_delta=1e-5, patience=20, restore_best_weights=True)
-    model.summary()
+    # model.summary()
     # plot_model(model, 'vgg16.png', show_shapes=True, show_layer_names=True)
-    checkpoint_path = log_dir + "/weights"
-    cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, monitor='val_accuracy', save_weights_only=True, save_best_only=True)
+    # checkpoint_path = log_dir + "/weights"
     if len(sys.argv) > 1 and sys.argv[1] == "image_gen":
         print("image_gen train")
         gen = image_gen.flow(x_train, y_train, batch_size=batch_size)
@@ -93,8 +92,8 @@ if __name__ == '__main__':
                             steps_per_epoch=50000 // batch_size,
                             epochs=epochs,
                             shuffle=True,
-                            validation_data=(x_test, y_test),
-                            callbacks=[cp_callback])
+                            validation_data=(x_test, y_test)
+                           )
     else:
         print("original train")
         model.fit(x_train,
@@ -105,10 +104,9 @@ if __name__ == '__main__':
                   shuffle=True,
                   callbacks=[cp_callback])
 
-    with open(log_dir + "/acc.log", 'w') as acc_log:
-        model.load_weights(checkpoint_path)
+    with open("result/acc.log", 'w') as acc_log:
+        # model.load_weights(checkpoint_path)
         score = model.evaluate(x_test, y_test, verbose=1)
 
         acc_log.write("test_loss " + str(score[0]) + " " + "test_accuracy " + str(score[1]))
-    print(log_dir)
 
