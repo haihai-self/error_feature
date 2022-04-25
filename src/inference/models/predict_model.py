@@ -94,14 +94,14 @@ def plotDF(df, savename):
 def claErrorModel(df_train, df_test, feature_index, indexes,  model, model_name, df_plot, pdf_name):
     """
     构建分类误差模型
-    :param df_train:
-    :param df_test:
-    :param feature_index:
-    :param indexes:
-    :param model:
-    :param model_name:
-    :param df_plot:
-    :param pdf_name:
+    :param df_train: 训练数据
+    :param df_test: 测试数据
+    :param feature_index: 训练需要的特征
+    :param indexes: 需要构建的应用名称
+    :param model: 需要训练的模型
+    :param model_name: 模型的名称, svm, mlp等
+    :param df_plot: 绘制数据使用的DataFrame
+    :param pdf_name: 保存pdf的名称
     :return:
     """
 
@@ -129,14 +129,14 @@ def claErrorModel(df_train, df_test, feature_index, indexes,  model, model_name,
 def regErrorModel(df_train, df_test, feature_index, indexes,  model, model_name, df_plot, pdf_name):
     """
     构建回归模型
-    :param df_train:
-    :param df_test:
-    :param feature_index:
-    :param indexes:
-    :param model:
-    :param model_name:
-    :param df_plot:
-    :param pdf_name:
+    :param df_train: 训练数据
+    :param df_test: 测试数据
+    :param feature_index: 训练需要的特征
+    :param indexes: 需要构建的应用名称
+    :param model: 需要训练的模型
+    :param model_name: 模型的名称, svm, mlp等
+    :param df_plot: 绘制数据使用的DataFrame
+    :param pdf_name: 保存pdf的名称
     :return:
     """
     for index in indexes:
