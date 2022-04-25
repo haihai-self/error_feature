@@ -146,7 +146,10 @@ def regErrorModel(df_train, df_test, feature_index, indexes,  model, model_name,
             trained_model = model(df, feature_index + fixed_feature)
             df = processData(df_test.copy())
             y, y_pre = predictRegression(trained_model, feature_index + fixed_feature, df)
-
+            df = df_test.copy()
+            df.insert(0, column='y_pre', value=y_pre)
+            df.sort_values(by=['classify', 'y_pre', 'untrained_acc'], inplace=True, ascending=[True, False, False])
+            df.to_csv('../result/csv/'+pdf_name+'_pre.csv')
         else:
             df = processDataSpec(df_train.loc[df_train.loc[:, 'concat'] == index, :].copy())
             trained_model = model(df, feature_index)

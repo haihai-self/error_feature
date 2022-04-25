@@ -1,17 +1,12 @@
-import os
-import numpy as np
 import pandas as pd
 import tensorflow as tf
 import tensorflow.keras as keras
-from error.data_process import processData
 
 gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
 tf.config.experimental.set_memory_growth(gpus[0], True)
 import sys
 sys.path.append('../')
-from models import predict_model
-from error.data_process import processDataSpec, processData
-from models.predict_model import predictClassify, predictRegression, predictSpectRegression
+import predict_model
 import matplotlib.pyplot as plt
 
 
@@ -47,7 +42,7 @@ def classifyMLP(df, feature_sel):
         loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         optimizer=keras.optimizers.Adam(1e-4),
         metrics=['accuracy', keras.metrics.SparseCategoricalCrossentropy()])
-    model.fit(train_dataset, epochs=400, verbose=2)
+    model.fit(train_dataset, epochs=300, verbose=2)
     return model
 
 
@@ -80,57 +75,6 @@ def regressionMLP(df, feature_sel):
 
     return model
 
-
-def plotMLP(df, savename):
-    """
-    绘制df数据折线图
-    :param df: DataFrame 数据结构，
-    :param savename:保存pdf的文件名
-    """
-    plt.style.use(['science', 'ieee'])
-    # df = df.sort_values(by='mape', ascending=True)
-    df.to_csv('../result/csv/' + savename + '.csv')
-    for index, data in df.iteritems():
-        plt.plot(df.index, data.values, label=index)
-    # plt.legend(label)
-    plt.legend(loc='best')
-    plt.xticks(rotation=300)
-
-    plt.savefig('../result/' + savename + '.pdf', bbox_inches='tight')
-    plt.show()
-
-
-# def mlpClaErrorModel():
-#     """
-#     mlp分类模型
-#     :return: 绘制分类对应指标图
-#     """
-#     df = pd.read_csv('../../error/source/train_norm.csv')
-#     df = processDataSpec(df)
-#     # feature_index = ['WCRE', 'WCE', 'mue_ED0']
-#     feature_index = ['mue_ED0', 'mue_ED', 'ER']
-#     # feature_index = ['var_ED', 'var_RED', 'mue_RED']
-#
-#     indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
-#                'resnet34cifar', 'resnet34cifar100']
-#     dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
-#
-#     for index in indexes:
-#         if index == 'domain':
-#             fixed_feature = ['net', 'dataset', 'concat']
-#             df_train = processData(df)
-#             model = classifyMLP(df_train, feature_index + fixed_feature)
-#             y, y_pre = predictClassify(model, feature_index + fixed_feature, 'mlp')
-#
-#         else:
-#
-#             df_train = df[df['concat'] == index]
-#
-#             model = classifyMLP(df_train, feature_index)
-#             y, y_pre = predictClassify(model, feature_index, 'mlp', index)
-#         res = classify.evaluation(y, y_pre)
-#         dt_df.loc[index, :] = res
-#     plotMLP(dt_df, 'cla_mlp_model')
 #
 # def getProb():
 #     feature_sel = ['mue_ED0', 'mue_ED', 'ER']
@@ -147,9 +91,37 @@ def plotMLP(df, savename):
 #     df2.sort_values(by=['classify', 'y_pre', 'untrained_acc'], inplace=True, ascending=[True, False, False])
 #     df2.to_csv('../result/csv/reg_pre.csv')
 
+def buildErrorModel():
+    df_train = pd.read_csv('../../error/source/train_norm.csv')
+    df_test = pd.read_csv('../../error/source/test_norm.csv')
+
+    # 构建分类误差模型
+    feature_index = ['mue_ED0', 'mue_ED', 'ER']
+    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist',  'resnet18cifar', 'vgg16cifar',
+               'resnet34cifar', 'resnet34cifar100']
+    dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
+    predict_model.claErrorModel(df_train, df_test, feature_index, indexes, classifyMLP, 'mlp', dt_df, 'cla_mlp_model')
+
+    # # 构建回归误差模型
+    feature_index =['mue_ED0', 'mue_ED', 'ER']
+    dt_df = pd.DataFrame(index=indexes, columns=['MAPE', r'$\chi^2$'])
+    predict_model.regErrorModel(df_train, df_test, feature_index, indexes, regressionMLP, 'mlp', dt_df, 'reg_mlp_model')
+
+    # 构建retrain分类误差模型
+    df_train = pd.read_csv('../../error/source/train_norm.csv')
+    df_test = pd.read_csv('../../error/source/test_norm.csv')
+
+
+    feature_index = ['WCRE', 'WCE', 'mue_ED0']
+    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist',  'resnet18cifar', 'vgg16cifar',
+               'resnet34cifar', 'resnet34cifar100']
+    dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
+
+
 if __name__ == '__main__':
+    buildErrorModel()
     # mlpClaErrorModel()
-    getProb()
+    # getProb()
     # df = pd.read_csv('../../error/source/train_norm.csv')
     # df = processData(df)
     # sel_feature = ['mue_ED0', 'var_ED0', 'mue_ED', 'NMED', 'var_ED', 'mue_RED', 'var_RED', 'mue_ARED', 'var_ARED',
@@ -162,4 +134,3 @@ if __name__ == '__main__':
     # y, y_pre = predict_model.predictRegression(model, sel_feature)
     # print(regression.evaluation(y, y_pre))
 
-# (0.07663883539536132, 0.9243362973604273) 200 256

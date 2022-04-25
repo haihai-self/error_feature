@@ -5,7 +5,6 @@ sys.path.append('..')
 from error.data_process import processData
 import numpy as np
 from models import svm, dt, rf, mlp
-from models.predict_model import predictClassify
 import matplotlib.pyplot as plt
 
 
