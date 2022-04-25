@@ -173,8 +173,7 @@ def treeRegModel():
 
 
 
-def threshold():
-    df = pd.read_csv('../error/source/dataset.csv')
+def threshold(df):
     df_plt = df[df['concat'] == 'vgg16cifar']
     df_plt.sort_values(by='mue_ED0')
 
@@ -182,7 +181,7 @@ def threshold():
     ax = plt.axes(projection='3d')
     feature_sel = ['mue_ED0', 'mue_ED', 'ER']
 
-    marker = ['o', 'x']
+    marker = ['o', 'x', 'v']
     for i in range(2):
         x = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[0]]
         y = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[1]]
@@ -207,6 +206,9 @@ if __name__ == '__main__':
     # wrapperClassify()
     # wrapperRegression()
     # treeRegModel()
-    threshold()
+    # df = pd.read_csv('../error/source/retrain_dataset.csv')
+    df = pd.read_csv('../error/source/dataset.csv')
+
+    threshold(df)
 
 

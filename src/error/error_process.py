@@ -145,9 +145,28 @@ def normRetrain():
     """
     df_train = pd.read_csv('./source/re_train_data.csv')
     df_test = pd.read_csv('./source/re_test_data.csv')
-    # df_val = pd.read_csv('./source/val_data.csv')
+
+    # 设置分类
+    app_dict = {
+        'vgg16cifar': 0.78521999764442444
+    }
+    for key, val in app_dict.items():
+        # 将train数据分类
+        df_train.loc[(df_train.loc[:, 'concat'] == key) & (df_train.loc[:, 'retrained_acc'] >= val), 'classify'] = 0
+        df_train.loc[(df_train.loc[:, 'concat'] == key) & ((val - df_train.loc[:, 'retrained_acc']) <= 0.05) & (
+                0 < (val - df_train.loc[:, 'retrained_acc'])), 'classify'] = 1
+        df_train.loc[(df_train.loc[:, 'concat'] == key) & (
+                0.05 < (val - df_train.loc[:, 'retrained_acc'])), 'classify'] = 2
+
+        # 将test数据分类
+        df_test.loc[(df_test.loc[:, 'concat'] == key) & (df_test.loc[:, 'retrained_acc'] >= val), 'classify'] = 0
+        df_test.loc[(df_test.loc[:, 'concat'] == key) & ((val - df_test.loc[:, 'retrained_acc']) <= 0.05) & (
+                0 < (val - df_test.loc[:, 'retrained_acc'])), 'classify'] = 1
+        df_test.loc[(df_test.loc[:, 'concat'] == key) & (
+                0.05 < (val - df_test.loc[:, 'retrained_acc'])), 'classify'] = 2
+
     df_dataset = pd.concat([df_train, df_test])
-    df_dataset.to_csv('./source/dataset.csv', index=False)
+    df_dataset.to_csv('./source/retrain_dataset.csv', index=False)
 
     # 得到训练集参数 用于归一化
     des = df_train.describe(percentiles=[0.5, 0.6, 0.7, 0.71, 0.72, 0.73, 0.74])
@@ -181,34 +200,10 @@ def normRetrain():
     # df_val.to_csv('./source/re_val_norm.csv', index=False)
 
 
-def classifyRetrain():
-    app_dict = {
-        'vgg16cifar': 0.78521999764442444
-    }
-    df_train = pd.read_csv('./source/re_train_norm.csv')
-    df_test = pd.read_csv('./source/re_test_norm.csv')
-
-    for key, val in app_dict.items():
-        # 将train数据分类
-        df_train.loc[(df_train.loc[:, 'concat'] == key) & (df_train.loc[:, 'retrained_acc'] >= val), 'classify'] = 0
-        df_train.loc[(df_train.loc[:, 'concat'] == key) & ((val - df_train.loc[:, 'retrained_acc']) <= 0.05) & (
-                0 < (val - df_train.loc[:, 'retrained_acc'])), 'classify'] = 1
-        df_train.loc[(df_train.loc[:, 'concat'] == key) & (
-                0.05 < (val - df_train.loc[:, 'retrained_acc'])), 'classify'] = 2
-
-        # 将test数据分类
-        df_test.loc[(df_test.loc[:, 'concat'] == key) & (df_test.loc[:, 'retrained_acc'] >= val), 'classify'] = 0
-        df_test.loc[(df_test.loc[:, 'concat'] == key) & ((val - df_test.loc[:, 'retrained_acc']) <= 0.05) & (
-                0 < (val - df_test.loc[:, 'retrained_acc'])), 'classify'] = 1
-        df_test.loc[(df_test.loc[:, 'concat'] == key) & (
-                0.05 < (val - df_test.loc[:, 'retrained_acc'])), 'classify'] = 2
-
-    df_train.to_csv('source/re_train_norm.csv')
-    df_test.to_csv('source/re_test_norm.csv')
-
 
 if __name__ == '__main__':
     # getRetrain()
     # addRetrain2data()
     # normRetrain()
-    classifyRetrain()
+    normDataset()
+    normRetrain()
