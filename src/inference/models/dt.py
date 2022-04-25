@@ -1,13 +1,10 @@
 from sklearn import tree
 import pandas as pd
-from models.predict_model import predictClassify, predictSpecClassify, predictRegression, predictSpectRegression
 import sys
 import matplotlib.pyplot as plt
 
 sys.path.append('..')
-from error.data_process import processDataSpec, processData
-from evaluate import classify, regression
-
+import predict_model
 
 def classifyDecisionTree(df, feature_index):
     """
@@ -61,72 +58,26 @@ def plotDT(df, savename):
     plt.savefig('../result/' + savename + '.pdf', bbox_inches='tight')
     plt.show()
 
-def dfClaErrorModel():
-    """
-    构建决策树误差模型，并绘制相应的指标图
-    :return:
-    """
-    df = pd.read_csv('../../error/source/train_norm.csv')
-    df = processDataSpec(df)
-    feature_index = ['WCRE', 'WCE', 'mue_ED0']
-    # feature_index = ['mue_ED0', 'mue_ED', 'ER']
-    # feature_index = ['var_ED', 'var_RED', 'mue_RED']
 
-    # 对应的spec类型
-    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'resnet18cifar', 'vgg16cifar',
+def buildErrorModel():
+    df_train = pd.read_csv('../../error/source/train_norm.csv')
+    df_test = pd.read_csv('../../error/source/test_norm.csv')
+
+    # 构建分类误差模型
+    feature_index = ['WCRE', 'WCE', 'mue_ED0']
+    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist',  'resnet18cifar', 'vgg16cifar',
                'resnet34cifar', 'resnet34cifar100']
     dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
+    predict_model.claErrorModel(df_train, df_test, feature_index, indexes, classifyDecisionTree, 'dt', dt_df, 'cla_dt_model')
 
-    for index in indexes:
-        if index == 'domain':
-            fixed_feature = ['net', 'dataset', 'concat']
-            df_train = processData(df)
-            model = classifyDecisionTree(df_train, feature_index + fixed_feature)
-            y, y_pre = predictClassify(model, feature_index + fixed_feature, index)
-
-        else:
-
-            df_train = df[df['concat'] == index]
-
-            model = classifyDecisionTree(df_train, feature_index)
-            y, y_pre = predictSpecClassify(model, feature_index, 'dt', index)
-        res = classify.evaluation(y, y_pre)
-        dt_df.loc[index, :] = res
-    plotDT(dt_df, 'cla_dt_model')
-
-def dfRegErrorModel():
-    """
-    构建决策树回归误差模型, 并绘制指标图
-    :return:
-    """
-    df = pd.read_csv('../../error/source/train_norm.csv')
-    df = processDataSpec(df)
-    # 需要的特征
+    # 构建回归误差模型
     feature_index = ['var_ED', 'var_RED', 'mue_RED']
-    # feature_index = ['mue_ED0', 'mue_ED', 'ER']
-
-    # 对应的spec类型
-    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
-               'resnet34cifar', 'resnet34cifar100']
     dt_df = pd.DataFrame(index=indexes, columns=['MAPE', r'$\chi^2$'])
+    predict_model.regErrorModel(df_train, df_test, feature_index, indexes, regressionDecisionTree, 'dt', dt_df, 'reg_dt_model')
 
-    for index in indexes:
-        if index == 'domain':
-            fixed_feature = ['net', 'dataset', 'concat']
-            df_train = processData(df)
-            model = regressionDecisionTree(df_train, feature_index + fixed_feature)
-            y, y_pre = predictRegression(model, feature_index + fixed_feature)
-
-        else:
-
-            df_train = df[df['concat'] == index]
-
-            model = regressionDecisionTree(df_train, feature_index)
-            y, y_pre = predictSpectRegression(model, feature_index, 'dt', index)
-        res = regression.evaluation(y, y_pre)
-        dt_df.loc[index, :] = res
-    plotDT(dt_df, 'reg_dt_model')
+    # 构建retrain分类误差模型
+    df_train = pd.read_csv('../../error/source/train_norm.csv')
+    df_test = pd.read_csv('../../error/source/test_norm.csv')
 
 if __name__ == '__main__':
-    dfRegErrorModel()
-    dfClaErrorModel()
+    buildErrorModel()
