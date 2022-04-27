@@ -119,8 +119,10 @@ def addRetrain2data():
     df_retrain = pd.read_csv('source/retrain.csv')
     df_train = pd.read_csv('source/train_data.csv')
     df_test = pd.read_csv('source/test_data.csv')
+    df_val = pd.read_csv('source/val_data.csv')
     df_train.insert(loc=1, column='retrained_acc', value=-1)
     df_test.insert(loc=1, column='retrained_acc', value=-1)
+    df_val.insert(loc=1, column='retrained_acc', value=-1)
 
     for index, row in df_retrain.iterrows():
         if row['concat'] == 'vgg16cifar10':
@@ -129,13 +131,17 @@ def addRetrain2data():
                 df_train.loc[:, 'concat'] == row['concat']), 'retrained_acc'] = row['retrained_acc']
         df_test.loc[(df_test.loc[:, 'mul_name'] == row['mul_name']) & (
                 df_test.loc[:, 'concat'] == row['concat']), 'retrained_acc'] = row['retrained_acc']
+        df_val.loc[(df_val.loc[:, 'mul_name'] == row['mul_name']) & (
+                df_val.loc[:, 'concat'] == row['concat']), 'retrained_acc'] = row['retrained_acc']
 
         # a = df_train.loc[:, 'mul_name'] row['mul_name']
         # b = df_retrain['concat'] == row['concat']
         # a = df_train.loc[df_train[:, 'mul_name'] == row['mul_name'] and df_retrain[:, 'concat'] == row['concat']]
     df_train.to_csv('./source/re_train_data.csv', index=False)
     df_test.to_csv('./source/re_test_data.csv', index=False)
-    # print("hello")
+    df_val.to_csv('./source/re_val_data.csv', index=False)
+    val_vgg = df_val.loc[df_val.loc[:, 'concat'] == 'vgg16cifar', :]
+    val_vgg.to_csv('./source/val_vgg.csv', index=False)
 
 
 def normRetrain():
@@ -205,5 +211,6 @@ if __name__ == '__main__':
     # getRetrain()
     # addRetrain2data()
     # normRetrain()
+    addRetrain2data()
     normDataset()
     normRetrain()

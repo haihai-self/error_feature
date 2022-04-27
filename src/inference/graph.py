@@ -184,7 +184,10 @@ def treeRegModel():
 
 def threshold(df):
     df_plt = df[df['concat'] == 'vgg16cifar']
-    df_plt.sort_values(by='mue_ED0')
+    df_plt.sort_values(by='mue_ED', inplace=True)
+
+    temp = df_plt.loc[df_plt.loc[:, 'classify'] != 2, :]
+    temp.to_csv('./result/vgg16_retrain.csv', index=False)
 
     plt.style.use(['science', 'ieee'])
     ax = plt.axes(projection='3d')
@@ -207,11 +210,11 @@ def threshold(df):
     ax.set_zlabel(r'$ER$')
     # ax.view_init(10, 150)
 
-    # plt.legend(loc=[.55, .1])
-    # plt.savefig('result/threshold_3d_r.pdf')
-
     plt.legend(loc=[.55, .1])
-    plt.savefig('result/threshold_3d_i.pdf')
+    plt.savefig('result/threshold_3d_r.pdf')
+
+    # plt.legend(loc=[.55, .1])
+    # plt.savefig('result/threshold_3d_i.pdf')
 
     # plt.show()
     plt.close()
@@ -277,8 +280,8 @@ if __name__ == '__main__':
     # wrapperClassify()
     # wrapperRegression()
     # treeRegModel()
-    # df = pd.read_csv('../error/source/retrain_dataset.csv')
-    df = pd.read_csv('../error/source/dataset.csv')
+    df = pd.read_csv('../error/source/retrain_dataset.csv')
+    # df = pd.read_csv('../error/source/dataset.csv')
 
     # threshold2d(df)
     threshold(df)
