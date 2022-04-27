@@ -182,7 +182,7 @@ def treeRegModel():
     plt.show()
 
 
-def threshold(df):
+def threshold(df, type='retrain'):
     df_plt = df[df['concat'] == 'vgg16cifar']
     df_plt.sort_values(by='mue_ED', inplace=True)
 
@@ -193,25 +193,40 @@ def threshold(df):
     ax = plt.axes(projection='3d')
     feature_sel = ['mue_ED0', 'mue_ED', 'ER']
 
-    marker = ['o', 'X', 'v']
-    edge_c = ['black', 'red', 'g']
+    marker = ['o', 'X', 'v', '^']
+    edge_c = ['black', 'red', 'g', 'b']
 
-    for i in [2, 1, 0]:
+    if type == 'retrain':
+        class_list = [2, 1, 0, -1]
+        pdf_name = 'threshold_3d_r.pdf'
+        legend_loc = [.2, .8]
+        ncol=2
+    else:
+        class_list = [2, 1, 0]
+        pdf_name = 'threshold_3d_i.pdf'
+        legend_loc = [.2, .8]
+        ncol=2
+
+    for i in class_list:
         x = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[0]]
         y = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[1]]
-        x = np.log(x+1)
-        y = np.log(y+1)
+        x = np.log(x + 1)
+        y = np.log(y + 1)
 
         z = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[2]]
 
-        ax.scatter3D(x, y, z, label='class%d' % (i), alpha=0.9, edgecolors=edge_c[i], marker=marker[i], c='w')
-    ax.set_ylabel(r'$\mu_{ED}$')
-    ax.set_xlabel(r'$\mu_E$')
+        if i != -1:
+            ax.scatter3D(x, y, z, label='class %d' % (i), alpha=0.9, edgecolors=edge_c[i], marker=marker[i], c='w')
+        else:
+            ax.scatter3D(x, y, z, label='class b', alpha=0.9, edgecolors=edge_c[i], marker=marker[i], c='w')
+    ax.set_ylabel(r'$\log_2(\mu_{ED})$')
+    ax.set_xlabel(r'$\log_2(\mu_E)$')
     ax.set_zlabel(r'$ER$')
-    # ax.view_init(10, 150)
 
-    plt.legend(loc=[.55, .1])
-    plt.savefig('result/threshold_3d_r.pdf')
+    ax.view_init(10, 150)
+
+    plt.legend(loc=legend_loc, ncol=ncol)
+    plt.savefig('result/' + pdf_name)
 
     # plt.legend(loc=[.55, .1])
     # plt.savefig('result/threshold_3d_i.pdf')
@@ -220,57 +235,61 @@ def threshold(df):
     plt.close()
 
 
-def threshold2d(df):
+def threshold2d(df, type='retrain'):
     df_plt = df[df['concat'] == 'vgg16cifar']
     # df_plt.sort_values(by='mue_ED', inplace=True)
 
     plt.style.use(['science', 'ieee'])
     feature_sel = ['mue_ED0', 'mue_ED', 'ER']
 
-    marker = ['o', '^', 'v']
-    edge_c = ['black', 'red', 'g']
+    marker = ['o', 'X', 'v', '^']
+    edge_c = ['black', 'red', 'g', 'b']
     fig, ax = plt.subplots(1, 1)
-    for i in [2, 1, 0]:
+    if type == 'retrain':
+        class_list = [2, 1, 0, -1]
+        pdf_name = 'threshold_2d_r.pdf'
+        axins = ax.inset_axes((.45, .1, .25, .25))
+        text_loc = [0.5, 0.03]
+        class_range=[25, 31]
+    else:
+        class_list = [2, 1, 0]
+        pdf_name = 'threshold_2d_i.pdf'
+        axins = ax.inset_axes((.44, .1, .25, .25))
+        text_loc = [0.4, 0.08]
+        class_range=[8, 10.5]
+
+
+    for i in class_list:
         x = df_plt.loc[(df.loc[:, 'classify'] == i) & ((df.loc[:, 'mue_ED0']) < 2000), feature_sel[0]]
         y = df_plt.loc[(x.index), feature_sel[1]]
-        x = np.log2(x+1)
-        y = np.log2(y+1)
+        x = np.log2(x + 1)
+        y = np.log2(y + 1)
 
-        # z = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[2]]
+        if i != -1:
+            ax.scatter(x, y, label='class %d' % (i), alpha=0.9, edgecolors=edge_c[i], marker=marker[i], c='w', lw=1,
+                       s=20)
+        else:
+            ax.scatter(x, y, label='class b', alpha=0.9, edgecolors=edge_c[i], marker=marker[i], c='w', lw=1, s=20)
 
-        ax.scatter(x, y, label='class%d' % (i), alpha=0.9, edgecolors=edge_c[i], marker=marker[i], c='w', lw=1, s=20)
-    plt.ylabel(r'$\mu_{ED}$')
-    plt.xlabel(r'$\mu_E$')
+    plt.ylabel(r'$\log_2(\mu_{ED})$')
+    plt.xlabel(r'$\log_2(\mu_E)$')
     plt.legend(loc='lower right')
 
-    # plt inference
-    # axins = ax.inset_axes((.44, .1, .25, .25))
-    # for i in [0, 1, 2]:
-    #     y = df_plt.loc[
-    #         (df.loc[:, 'classify'] == i) & ((df.loc[:, 'mue_ED'] < 10.5) & (df.loc[:, 'mue_ED'] > 8)), feature_sel[1]]
-    #     x = df_plt.loc[(y.index), feature_sel[0]]
-    #     x = np.log2(x+1)
-    #     y = np.log2(y+1)
-    #     axins.scatter(x, y, alpha=0.8, edgecolors=edge_c[i], marker=marker[i], c='w', s=20)
-    #     if i == 2:
-    #         axins.text(x - 0.4, y + 0.08, s='(' + '%.1f' % x.values[0] + ',' + '%.1f' % y.values[0] + ')', size=7)
-    # mark_inset(ax, axins, loc1=3, loc2=2, fc="none", ec='k', lw=1, linestyle='--')
-    # plt.savefig('result/threshold_2d_i.pdf')
-    # plt.close()
-
-
-    # plt retrain
-    axins = ax.inset_axes((.45, .1, .25, .25))
-    for i in [0, 1, 2]:
-        y = df_plt.loc[(df.loc[:, 'classify'] == i) & ((df.loc[:, 'mue_ED'] < 31) & (df.loc[:, 'mue_ED'] > 25)), feature_sel[1]]
+    class_list.reverse()
+    for i in class_list:
+        y = df_plt.loc[
+            (df.loc[:, 'classify'] == i) & ((df.loc[:, 'mue_ED'] < class_range[1]) & (df.loc[:, 'mue_ED'] > class_range[0])), feature_sel[1]]
         x = df_plt.loc[(y.index), feature_sel[0]]
         x = np.log2(x)
         y = np.log2(y)
         axins.scatter(x, y, alpha=0.8, edgecolors=edge_c[i], marker=marker[i], c='w', s=20)
         if i == 2:
-            axins.text(x-0.5 , y+0.03 , s='(' + '%.1f' % x.values[0] + ',' + '%.1f' % y.values[0] + ')', size=7)
+            axins.text(x - text_loc[0], y + text_loc[1],
+                       s='(' + '%.1f' % x.values[0] + ',' + '%.1f' % y.values[0] + ')', size=7)
     mark_inset(ax, axins, loc1=3, loc2=1, fc="none", ec='k', lw=1, linestyle='--')
-    plt.savefig('result/threshold_2d_r.pdf')
+
+    plt.savefig('result/' + pdf_name)
+
     plt.close()
 
 
@@ -280,8 +299,8 @@ if __name__ == '__main__':
     # wrapperClassify()
     # wrapperRegression()
     # treeRegModel()
-    df = pd.read_csv('../error/source/retrain_dataset.csv')
-    # df = pd.read_csv('../error/source/dataset.csv')
+    df_r = pd.read_csv('../error/source/retrain_dataset.csv')
+    df_i = pd.read_csv('../error/source/dataset.csv')
 
-    # threshold2d(df)
-    threshold(df)
+    threshold2d(df_i, 'unretrain')
+    # threshold(df_r, 'retrain')

@@ -158,18 +158,23 @@ def normRetrain():
     }
     for key, val in app_dict.items():
         # 将train数据分类
-        df_train.loc[(df_train.loc[:, 'concat'] == key) & (df_train.loc[:, 'retrained_acc'] >= val), 'classify'] = 0
-        df_train.loc[(df_train.loc[:, 'concat'] == key) & ((val - df_train.loc[:, 'retrained_acc']) <= 0.05) & (
-                0 < (val - df_train.loc[:, 'retrained_acc'])), 'classify'] = 1
+        df_train.loc[(df_train.loc[:, 'concat'] == key) & (df_train.loc[:, 'retrained_acc'] >= val), 'classify'] = -1
+        df_train.loc[(df_train.loc[:, 'concat'] == key) & ((val - df_train.loc[:, 'retrained_acc']) <= 0.03) & (
+                0 < (val - df_train.loc[:, 'retrained_acc'])), 'classify'] = 0
         df_train.loc[(df_train.loc[:, 'concat'] == key) & (
-                0.05 < (val - df_train.loc[:, 'retrained_acc'])), 'classify'] = 2
+            (0.03 <val - df_train.loc[:, 'retrained_acc']) & (val - df_train.loc[:, 'retrained_acc'] <=0.08)), 'classify'] = 1
+        df_train.loc[(df_train.loc[:, 'concat'] == key) & (
+                (0.08 < val - df_train.loc[:, 'retrained_acc'])), 'classify'] = 2
 
         # 将test数据分类
-        df_test.loc[(df_test.loc[:, 'concat'] == key) & (df_test.loc[:, 'retrained_acc'] >= val), 'classify'] = 0
-        df_test.loc[(df_test.loc[:, 'concat'] == key) & ((val - df_test.loc[:, 'retrained_acc']) <= 0.05) & (
-                0 < (val - df_test.loc[:, 'retrained_acc'])), 'classify'] = 1
+        df_test.loc[(df_test.loc[:, 'concat'] == key) & (df_test.loc[:, 'retrained_acc'] >= val), 'classify'] = -1
+        df_test.loc[(df_test.loc[:, 'concat'] == key) & ((val - df_test.loc[:, 'retrained_acc']) <= 0.03) & (
+                0 < (val - df_test.loc[:, 'retrained_acc'])), 'classify'] = 0
         df_test.loc[(df_test.loc[:, 'concat'] == key) & (
-                0.05 < (val - df_test.loc[:, 'retrained_acc'])), 'classify'] = 2
+                (0.03 < val - df_test.loc[:, 'retrained_acc']) & (
+                    val - df_test.loc[:, 'retrained_acc'] <= 0.08)), 'classify'] = 1
+        df_test.loc[(df_test.loc[:, 'concat'] == key) & (
+            (0.08 < val - df_test.loc[:, 'retrained_acc'])), 'classify'] = 2
 
     df_dataset = pd.concat([df_train, df_test])
     df_dataset.to_csv('./source/retrain_dataset.csv', index=False)
