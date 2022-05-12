@@ -302,5 +302,5 @@ if __name__ == '__main__':
     df_r = pd.read_csv('../error/source/retrain_dataset.csv')
     df_i = pd.read_csv('../error/source/dataset.csv')
 
-    threshold2d(df_i, 'unretrain')
-    # threshold(df_r, 'retrain')
+    # threshold2d(df_i, 'unretrain')
+    threshold(df_i, 'unretrain')
