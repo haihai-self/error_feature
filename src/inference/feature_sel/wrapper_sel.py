@@ -20,6 +20,7 @@ def evaluationModelClassify(feature_index, model, model_name):
     :return: 分类模型测试结果 top1 top2 recall-1 weight-tpr macro-tpr
     """
     df_test = pd.read_csv('../../error/source/test_norm.csv')
+    df_test = processData(df_test)
     y, y_pre = predict_model.predictClassify(model, feature_index, model_name, df_test)
     y = np.array(y)
     result = classify.evaluation(y, y_pre)
