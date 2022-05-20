@@ -213,8 +213,12 @@ def normRetrain():
 
 def fixDataset():
     dataset_df = pd.read_csv('./source/dataset.csv')
-    error_df = pd.read_csv('./source/dataset.csv')
-
+    error_df = pd.read_csv('./source/err.csv', index_col='mul_name')
+    columns = error_df.columns
+    for index, row in error_df.iterrows():
+        for item in columns:
+            dataset_df.loc[dataset_df.loc[:]['mul_name'] == index, item] = error_df.loc[index][item]
+    dataset_df.to_csv('./source/dataset.csv', index=False)
 
 
 if __name__ == '__main__':
