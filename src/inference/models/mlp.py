@@ -40,9 +40,9 @@ def classifyMLP(df, feature_sel):
     #                                                  save_weights_only=True,
     #                                                  save_best_only=True)
     model.compile(
-        loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        loss=keras.losses.SparseCategoricalCrossentropy(from_logits=False),
         optimizer=keras.optimizers.Adam(1e-3),
-        metrics=['accuracy', keras.metrics.SparseCategoricalCrossentropy(from_logits=True)])
+        metrics=['accuracy', keras.metrics.SparseCategoricalCrossentropy(from_logits=False)])
     model.fit(train_dataset, epochs=100, verbose=2)
     return model
 
