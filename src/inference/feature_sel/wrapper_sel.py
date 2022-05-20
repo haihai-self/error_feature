@@ -19,8 +19,8 @@ def evaluationModelClassify(feature_index, model, model_name):
     :param model_name: 模型对应的名称 SVM DT MLP RF等
     :return: 分类模型测试结果 top1 top2 recall-1 weight-tpr macro-tpr
     """
-
-    y, y_pre = predict_model.predictClassify(model, feature_index, model_name)
+    df_test = pd.read_csv('../../error/source/test_norm.csv')
+    y, y_pre = predict_model.predictClassify(model, feature_index, model_name, df_test)
     y = np.array(y)
     result = classify.evaluation(y, y_pre)
 
