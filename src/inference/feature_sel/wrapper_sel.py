@@ -114,8 +114,8 @@ if __name__ == '__main__':
     func_dict = {}
     # func_dict['dt'] = dt.classifyDecisionTree
     # func_dict['rf'] = rf.classifyRF
-    func_dict['svm'] = svm.classifySVM
-    # func_dict['mlp'] = mlp.classifyMLP
+    # func_dict['svm'] = svm.classifySVM
+    func_dict['mlp'] = mlp.classifyMLP
     feature = {}
 
     for key in func_dict:
