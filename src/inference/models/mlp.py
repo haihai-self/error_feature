@@ -43,7 +43,7 @@ def classifyMLP(df, feature_sel):
         loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         optimizer=keras.optimizers.Adam(1e-3),
         metrics=['accuracy', keras.metrics.SparseCategoricalCrossentropy(from_logits=True)])
-    model.fit(train_dataset, epochs=300, verbose=2)
+    model.fit(train_dataset, epochs=100, verbose=2)
     return model
 
 
