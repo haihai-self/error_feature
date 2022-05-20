@@ -1,3 +1,6 @@
+import sys
+
+sys.path.append('../../')
 import numpy as np
 import pandas as pd
 from error.data_process import processData, processDataSpec

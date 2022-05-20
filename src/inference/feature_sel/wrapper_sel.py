@@ -4,6 +4,7 @@ import sys
 
 sys.path.append('..')
 sys.path.append('../../')
+sys.path.append('.')
 from models import svm, dt, rf, predict_model, mlp
 from evaluate import classify, regression
 import numpy as np

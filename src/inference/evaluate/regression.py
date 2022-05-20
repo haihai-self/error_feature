@@ -5,7 +5,7 @@ import sys
 sys.path.append('..')
 from error.data_process import processData
 import numpy as np
-from models import svm, dt, rf, predict_model, mlp
+from models import predict_model, mlp, svm, dt, rf
 
 def mape_score(y, y_pre):
     return metrics.mean_absolute_percentage_error(y, y_pre)

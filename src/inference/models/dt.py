@@ -4,8 +4,8 @@ import sys
 import matplotlib.pyplot as plt
 
 sys.path.append('..')
-import predict_model
-
+sys.path.append('.')
+from models import predict_model
 def classifyDecisionTree(df, feature_index):
     """
     使用制定的特征训练分类DT

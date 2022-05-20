@@ -5,9 +5,8 @@ import sys
 sys.path.append('..')
 sys.path.append('../../')
 import matplotlib.pyplot as plt
-import predict_model
 from evaluate import classify, regression
-
+from models import predict_model
 
 def classifyRF(df, feature_index):
     """
