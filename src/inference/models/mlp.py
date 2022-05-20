@@ -2,7 +2,9 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import tensorflow.keras as keras
+import os
 
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
 tf.config.experimental.set_memory_growth(gpus[0], True)
 import sys
