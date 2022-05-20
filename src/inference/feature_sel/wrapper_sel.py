@@ -89,7 +89,9 @@ def lvmRegression(df, func):
     t = 0
     T = 30
     while t < T:
-        d_cur = random.randint(1, len(feature_index))
+        # d_cur = random.randint(1, len(feature_index))
+        d_cur = 3
+
         a_cur = random.sample(feature_index, d_cur)
         model = func(df, a_cur + fixed_feature)
         e_cur = evaluationModelRegression(a_cur + fixed_feature, model)
