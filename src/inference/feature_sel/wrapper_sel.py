@@ -108,18 +108,23 @@ def lvmRegression(df, func):
 if __name__ == '__main__':
     df = pd.read_csv('../../error/source/train_norm.csv')
     df = processData(df)
-    func_dict = {}
-    # func_dict['dt'] = dt.classifyDecisionTree
-    func_dict['svm'] = svm.classifySVM
-    # func_dict['rf'] = rf.classifyRF
-    # func_dict['mlp'] = mlp.classifyMLP
 
+    # 分类问题模型
+    func_dict = {}
+    func_dict['dt'] = dt.classifyDecisionTree
+    # func_dict['svm'] = svm.classifySVM
+    func_dict['rf'] = rf.classifyRF
+    # func_dict['mlp'] = mlp.classifyMLP
+    feature = {}
 
     for key in func_dict:
-        feature = lvmClassify(df, func_dict[key], key)
-        print(feature)
+        temp = lvmClassify(df, func_dict[key], key)
+        feature[key] = temp
+    print("\n\n the result of lvm: \n")
+    for key in feature:
+        print(feature[key])
 
-
+    # 回顾问题模型
     # func_dict = {}
     # func_dict['dt'] = dt.regressionDecisionTree
     # func_dict['svm'] = svm.regressionSVM
