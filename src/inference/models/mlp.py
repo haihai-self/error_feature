@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import tensorflow as tf
 import tensorflow.keras as keras
@@ -18,7 +19,7 @@ def classifyMLP(df, feature_sel):
     y = df.loc[:,'classify']
     x = df.loc[:, feature_sel]
 
-    dataset = tf.data.Dataset.from_tensor_slices((x, y))
+    dataset = tf.data.Dataset.from_tensor_slices((x.values(), y.values()))
     train_dataset = dataset.shuffle(len(df)).batch(20)
 
     model = keras.Sequential([
