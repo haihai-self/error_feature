@@ -211,11 +211,17 @@ def normRetrain():
     # df_val.to_csv('./source/re_val_norm.csv', index=False)
 
 
+def fixDataset():
+    dataset_df = pd.read_csv('./source/dataset.csv')
+    error_df = pd.read_csv('./source/dataset.csv')
+
+
 
 if __name__ == '__main__':
     # getRetrain()
     # addRetrain2data()
     # normRetrain()
-    addRetrain2data()
-    normDataset()
-    normRetrain()
+    # addRetrain2data()
+    # normDataset()
+    # normRetrain()
+    fixDataset()

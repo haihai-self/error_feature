@@ -113,8 +113,8 @@ if __name__ == '__main__':
     # 分类问题模型
     func_dict = {}
     func_dict['dt'] = dt.classifyDecisionTree
-    # func_dict['svm'] = svm.classifySVM
     func_dict['rf'] = rf.classifyRF
+    # func_dict['svm'] = svm.classifySVM
     # func_dict['mlp'] = mlp.classifyMLP
     feature = {}
 
@@ -123,7 +123,7 @@ if __name__ == '__main__':
         feature[key] = temp
     print("\n\n the result of lvm: \n")
     for key in feature:
-        print(feature[key])
+        print(key, ':', feature[key])
 
     # 回顾问题模型
     # func_dict = {}
