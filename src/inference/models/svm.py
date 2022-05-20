@@ -5,8 +5,7 @@ import sys
 
 sys.path.append('..')
 from evaluate import regression, classify
-import predict_model
-
+from models import predict_model
 def classifySVM(df, feature_index):
     """
     svm 分类模型，需要搜索
