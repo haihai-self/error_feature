@@ -94,9 +94,9 @@ def buildErrorModel():
 
     # 构建分类误差模型
     feature_index = ['mue_ED0', 'mue_ED', 'ER']
-    # indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist',  'resnet18cifar', 'vgg16cifar',
-    #            'resnet34cifar', 'resnet34cifar100']
-    indexes = ['resnet34cifar100']
+    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist',  'resnet18cifar', 'vgg16cifar',
+               'resnet34cifar', 'resnet34cifar100']
+    # indexes = ['resnet34cifar100']
     dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
     predict_model.claErrorModel(df_train, df_test, feature_index, indexes, classifyMLP, 'mlp', dt_df, 'cla_mlp_model')
 
@@ -117,7 +117,7 @@ def buildErrorModel():
 
 
 if __name__ == '__main__':
-    buildErrorModel()
+    mlpClaRetrain()
     # mlpClaErrorModel()
     # getProb()
     # df = pd.read_csv('../../error/source/train_norm.csv')
