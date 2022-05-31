@@ -29,8 +29,6 @@ def classifyMLP(df, feature_sel):
         keras.layers.Dropout(0.5),
         keras.layers.Dense(256, activation='relu'),
         keras.layers.Dropout(0.5),
-        keras.layers.Dense(128, activation='relu'),
-        keras.layers.Dropout(0.5),
 
         keras.layers.Dense(3, activation='softmax')
     ])
@@ -64,8 +62,6 @@ def regressionMLP(df, feature_sel):
         keras.layers.Dense(128, activation='relu'),
         keras.layers.Dense(256, activation='relu'),
 
-        # keras.layers.Dense(512, activation='relu'),
-        # keras.layers.Dense(1024, activation='relu'),
         keras.layers.Dense(1, activation=keras.activations.sigmoid)
     ])
     model.compile(
@@ -76,21 +72,6 @@ def regressionMLP(df, feature_sel):
 
     return model
 
-#
-# def getProb():
-#     feature_sel = ['mue_ED0', 'mue_ED', 'ER']
-#     fixed_feature = ['net', 'dataset', 'concat']
-#     feature_sel += fixed_feature
-#     df1 = pd.read_csv('../../error/source/train_norm.csv', index_col='mul_name')
-#     df1 = processData(df1)
-#     df2 = pd.read_csv('../../error/source/test_norm.csv', index_col='mul_name')
-#
-#     model = regressionMLP(df1, feature_sel)
-#     y, y_pre = predict_model.predictRegression(model, feature_sel, True)
-#     df2.insert(0, column='y_pre', value=y_pre)
-#     # df2.loc[:, 'y_pre'] = y_pre[:, 0]
-#     df2.sort_values(by=['classify', 'y_pre', 'untrained_acc'], inplace=True, ascending=[True, False, False])
-#     df2.to_csv('../result/csv/reg_pre.csv')
 
 def buildErrorModel():
     df_train = pd.read_csv('../../error/source/train_norm.csv')

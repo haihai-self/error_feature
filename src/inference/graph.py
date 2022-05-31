@@ -183,7 +183,6 @@ def treeRegModel():
 
 def threshold(df, type='retrain'):
     df_plt = df[df['concat'] == 'vgg16cifar']
-    df_plt.sort_values(by='mue_ED', inplace=True)
 
     temp = df_plt.loc[df_plt.loc[:, 'classify'] != 2, :]
     temp.to_csv('./result/vgg16_retrain.csv', index=False)
@@ -207,19 +206,20 @@ def threshold(df, type='retrain'):
         ncol=2
 
     for i in class_list:
-        x = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[0]]
-        y = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[1]]
+        x = df_plt.loc[(df.loc[:, 'classify'] == i) & ((df.loc[:, 'mue_ED0']) < 1024), feature_sel[0]]
+
+        y = df_plt.loc[x.index, feature_sel[1]]
         x = np.log(x + 1)
         y = np.log(y + 1)
 
-        z = df_plt.loc[df.loc[:, 'classify'] == i, feature_sel[2]]
+        z = df_plt.loc[x.index, feature_sel[2]]
 
         if i != -1:
             ax.scatter3D(x, y, z, label='class %d' % (i), alpha=0.9, edgecolors=edge_c[i], marker=marker[i], c='w')
         else:
             ax.scatter3D(x, y, z, label='class b', alpha=0.9, edgecolors=edge_c[i], marker=marker[i], c='w')
-    ax.set_ylabel(r'$\log_2(\mu_{ED})$')
     ax.set_xlabel(r'$\log_2(\mu_E)$')
+    ax.set_ylabel(r'$\log_2(\mu_{ED})$')
     ax.set_zlabel(r'$ER$')
 
     ax.view_init(10, 150)
@@ -236,7 +236,6 @@ def threshold(df, type='retrain'):
 
 def threshold2d(df, type='retrain'):
     df_plt = df[df['concat'] == 'vgg16cifar']
-    # df_plt.sort_values(by='mue_ED', inplace=True)
 
     plt.style.use(['science', 'ieee'])
     feature_sel = ['mue_ED0', 'mue_ED', 'ER']
@@ -259,7 +258,7 @@ def threshold2d(df, type='retrain'):
 
 
     for i in class_list:
-        x = df_plt.loc[(df.loc[:, 'classify'] == i) & ((df.loc[:, 'mue_ED0']) < 2000), feature_sel[0]]
+        x = df_plt.loc[(df.loc[:, 'classify'] == i) & ((df.loc[:, 'mue_ED0']) < 1024), feature_sel[0]]
         y = df_plt.loc[(x.index), feature_sel[1]]
         x = np.log2(x + 1)
         y = np.log2(y + 1)
@@ -301,5 +300,7 @@ if __name__ == '__main__':
     df_r = pd.read_csv('../error/source/retrain_dataset.csv')
     df_i = pd.read_csv('../error/source/dataset.csv')
 
-    # threshold2d(df_i, 'unretrain')
+    threshold2d(df_i, 'unretrain')
     threshold(df_i, 'unretrain')
+    threshold2d(df_r, 'retrain')
+    threshold(df_r, 'retrain')

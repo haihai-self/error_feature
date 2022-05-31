@@ -1,3 +1,5 @@
+import math
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
@@ -220,6 +222,51 @@ def fixDataset():
             dataset_df.loc[dataset_df.loc[:]['mul_name'] == index, item] = error_df.loc[index][item]
     dataset_df.to_csv('./source/dataset.csv', index=False)
 
+    dataset_df = pd.read_csv('./source/retrain_dataset.csv')
+    for index, row in error_df.iterrows():
+        for item in columns:
+            dataset_df.loc[dataset_df.loc[:]['mul_name'] == index, item] = error_df.loc[index][item]
+    dataset_df.to_csv('./source/retrain_dataset.csv', index=False)
+
+def classify():
+    dataset_df = pd.read_csv('./source/dataset.csv')
+    app_dict = {
+        # 'vgg16cifar': 0.78521999764442444,
+        'vgg16mnist':0.989199995994568,
+        'vgg16cifar': 0.7093999981880188,
+        'resnet34mnist':0.9918000102043152,
+        'resnet34cifar100': 0.7002999782562256,
+        'resnet34cifar': 0.930899977684021,
+        'resnet18mnist': 0.9915000200271606,
+        'resnet18cifar': 0.9239000082015992,
+
+    }
+    number = {}
+    for key in app_dict:
+        df_temp = dataset_df.loc[dataset_df.loc[:, 'concat'] == key, :]
+        count = [0 for _ in range(101)]
+        for index, row in df_temp.iterrows():
+            acc = row['untrained_acc']
+            count_index = math.ceil(abs(acc - app_dict[key])/ app_dict[key] * 100)
+            count[count_index] += 1
+        temp = [count[1], count[2], count[3], count[8]]
+
+        for i in range(1, 101, 1):
+            count[i] += count[i-1]
+        plt.style.use(['science', 'ieee'])
+        plt.plot([i for i in range(1, 10, 1)], count[1:10])
+        number[key] = temp
+        # plt.title(key)
+        plt.xlabel('loss of precision')
+        plt.ylabel('number of AMs')
+
+        plt.savefig('./' + key + '.pdf')
+        # plt.show()
+        plt.close()
+    print(number)
+    # des.to_csv('./source/temp.csv')
+
+    # df_process.to_csv('./source/temp.csv')
 
 if __name__ == '__main__':
     # getRetrain()
@@ -228,4 +275,5 @@ if __name__ == '__main__':
     # addRetrain2data()
     # normDataset()
     # normRetrain()
-    fixDataset()
+    # fixDataset()
+    classify()
