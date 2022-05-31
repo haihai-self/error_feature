@@ -107,6 +107,11 @@ def wrapperRegression():
 def dropRankCla():
     # 绘制droprank得到的特征重要性排序图--分类模型
     df = pd.read_csv('result/drop.csv')
+    df_plot = df.copy()
+    df_plot = df_plot.T
+    df_plot.sort_values(by=0, ascending=False, inplace=True, axis=0)
+    print(df_plot.index)
+    df_plot = df_plot.T
     df_plot = df.rename(
         columns={'mue_ED0': r'$\mu_E$', 'var_ED0': r'$\sigma_E$', 'mue_ED': r'$\mu_{ED}$',
                  'var_ED': r'$\sigma_{ED}$', 'mue_RED': r'$\mu_{RE}$', 'var_RED': r'$\sigma_{RE}$',
@@ -118,8 +123,7 @@ def dropRankCla():
     plt.figure(figsize=(9, 5))
     count = 0
     plt.style.use('science')
-    df_plot.sort_values(by=0, ascending=False, inplace=True, axis=0)
-    print(df_plot.index)
+
     for index, data in df_plot.iteritems():
         plt.plot(df_plot.index, data)
         count += 1
@@ -292,15 +296,15 @@ def threshold2d(df, type='retrain'):
 
 
 if __name__ == '__main__':
-    # dropRankCla()
+    dropRankCla()
     # dropRankReg()
     # wrapperClassify()
     # wrapperRegression()
     # treeRegModel()
-    df_r = pd.read_csv('../error/source/retrain_dataset.csv')
-    df_i = pd.read_csv('../error/source/dataset.csv')
-
-    threshold2d(df_i, 'unretrain')
-    threshold(df_i, 'unretrain')
-    threshold2d(df_r, 'retrain')
-    threshold(df_r, 'retrain')
+    # df_r = pd.read_csv('../error/source/retrain_dataset.csv')
+    # df_i = pd.read_csv('../error/source/dataset.csv')
+    #
+    # threshold2d(df_i, 'unretrain')
+    # threshold(df_i, 'unretrain')
+    # threshold2d(df_r, 'retrain')
+    # threshold(df_r, 'retrain')

@@ -73,14 +73,30 @@ def regressionMLP(df, feature_sel):
     return model
 
 
+def mlpClaRetrain():
+    df_train = pd.read_csv('../../error/source/train_norm.csv')
+    df_test = pd.read_csv('../../error/source/test_norm.csv')
+    feature_rank = ['mue_ED0', 'mue_ED', 'ER', 'RMS_ED', 'NMED', 'var_ED0', 'var_ED',
+       'mue_RED', 'zero', 'RMS_RED', 'var_RED', 'var_ARED', 'WCE', 'mue_ARED',
+       'single', 'WCRE']
+    for i in range(len(feature_rank)):
+        feature_index = feature_rank[0:i]
+        indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist',  'resnet18cifar', 'vgg16cifar',
+               'resnet34cifar', 'resnet34cifar100']
+        dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
+        predict_model.claErrorModel(df_train, df_test, feature_index, indexes, classifyMLP, 'mlp', dt_df,
+                                    'cla_mlp_model' + str(i))
+
+
 def buildErrorModel():
     df_train = pd.read_csv('../../error/source/train_norm.csv')
     df_test = pd.read_csv('../../error/source/test_norm.csv')
 
     # 构建分类误差模型
     feature_index = ['mue_ED0', 'mue_ED', 'ER']
-    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist',  'resnet18cifar', 'vgg16cifar',
-               'resnet34cifar', 'resnet34cifar100']
+    # indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist',  'resnet18cifar', 'vgg16cifar',
+    #            'resnet34cifar', 'resnet34cifar100']
+    indexes = ['resnet34cifar100']
     dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
     predict_model.claErrorModel(df_train, df_test, feature_index, indexes, classifyMLP, 'mlp', dt_df, 'cla_mlp_model')
 
