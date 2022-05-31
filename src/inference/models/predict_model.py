@@ -81,7 +81,7 @@ def plotDF(df, savename):
     :param df: DataFrame 数据结构，
     :param savename:保存pdf的文件名
     """
-    plt.style.use(['science', 'ieee'])
+    # plt.style.use(['science', 'ieee'])
     df.to_csv('../result/csv/' + savename + '.csv')
 
     for index, data in df.iteritems():
