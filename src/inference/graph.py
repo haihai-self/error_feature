@@ -45,7 +45,7 @@ def wrapperClassify():
     data = [[97.40068661108387, 98.43060323688081, 95.11278195488721, 97.40068661108387, 88.45246893011378], # RMS_RED', 'WCRE', 'mue_ED'
             [98.52869053457577, 99.41147621383031, 97.36842105263158, 98.52869053457577, 89.53380599370298], # 'var_ED0', 'var_RED', 'mue_ED0'
             [96.17459538989701, 98.0872976949485, 93.23308270676691, 96.17459538989701,  73.41863324392595], # 'ER', 'mue_ED0', 'var_ED'
-            [0.973516429622364, 0.9916625796959294, 0.9548872180451128, 0.973516429622364, 0.8853902252339932]]
+            [96.46885728298186, 99.16625796959295, 91.35338345864662, 96.46885728298186, 79.71030582159656]] # 'var_ARED', 'ER', 'RMS_ED'
     data = np.array(data)
     columns = ['acc-1', 'acc-2', 'recall-1', 'weight-tpr', 'macro-tpr']
     index = ['DT', 'RF', 'SVM', 'MLP']
@@ -67,12 +67,11 @@ def wrapperClassify():
 
 def wrapperRegression():
     # 得到lvm方法回归模型对应的指
-    data = [[0.07773549004573779, 0.9468117451601555],
-            [0.08881568010298237, 0.9611718110937534],
-            [0.2545986885971268, 0.8520471294395444],
+    data = [[8.688135868367432, 93.3001955340236],  # 'mue_ED', 'RMS_RED', 'mue_ED0'
+            [9.38124806487342, 94.87308612377005], #'mue_ED0', 'var_ED0', 'mue_ARED'
+            [115.91031982908446, 76.07126594479092], # 'WCE', 'ER', 'mue_ARED'
             [0.06844977317607073, 0.9235117926731133]]
     data = np.array(data)
-    data = data * 100
     columns = ['mape', r'$R^2$']
     index = ['DT', 'RF', 'SVM', 'MLP']
     plt.style.use(['science', 'ieee'])
@@ -140,6 +139,10 @@ def dropRankCla():
 def dropRankReg():
     # 绘制droprank得到的特征重要性排序图--回归模型
     df = pd.read_csv('result/regression_drop_rank.csv')
+    df_plot = df.copy()
+    df_plot = df_plot.T
+    df_plot.sort_values(by=0, ascending=False, inplace=True, axis=0)
+    print(df_plot.index)
     df_plot = df.rename(
         columns={'mue_ED0': r'$\mu_E$', 'var_ED0': r'$\sigma_E$', 'mue_ED': r'$\mu_{ED}$',
                  'var_ED': r'$\sigma_{ED}$', 'mue_RED': r'$\mu_{RE}$', 'var_RED': r'$\sigma_{RE}$',
@@ -148,11 +151,12 @@ def dropRankReg():
                  'single_side': r'$E_{ss}$', 'zero_error': r'$E_{zo}$'
                  })
     df_plot = df_plot.T
+    df_plot.sort_values(by=0, ascending=False, inplace=True, axis=0)
+    print(df_plot.index)
     plt.style.use('science')
     plt.figure(figsize=(9, 5))
     count = 0
-    df_plot.sort_values(by=0, ascending=False, inplace=True, axis=0)
-    print(df_plot.index)
+
     for index, data in df_plot.iteritems():
         plt.plot(df_plot.index, data)
         count += 1
@@ -296,8 +300,8 @@ def threshold2d(df, type='retrain'):
 
 
 if __name__ == '__main__':
-    dropRankCla()
-    # dropRankReg()
+    # dropRankCla()
+    dropRankReg()
     # wrapperClassify()
     # wrapperRegression()
     # treeRegModel()
