@@ -7,22 +7,21 @@ from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 
 
 def feature2latex():
-    treeRegModel()
-    # dt_cla_fea = ['var_RED', 'single-sided', 'var_ARED', 'mue_ED0', 'ER', 'mue_ARED', 'mue_RED', 'var_ED', 'RMS_ED', 'NMED', 'WCE']
+    # dt_cla_fea = ['RMS_RED', 'WCRE', 'mue_ED']
     # str2latex(dt_cla_fea)
-    # rf_cla_fea = ['var_ED0', 'WCE', 'mue_ED0', 'var_RED', 'RMS_RED']
+    # rf_cla_fea = ['var_ED0', 'var_RED', 'mue_ED0']
     # str2latex(rf_cla_fea)
-    # svm_cla_fea = ['var_ED', 'ER', 'WCE', 'WCRE', 'mue_RED', 'RMS_ED', 'RMS_RED', 'mue_ARED', 'single-sided', 'mue_ED', 'var_ARED', 'mue_ED0', 'var_RED']
+    # svm_cla_fea = ['ER', 'mue_ED0', 'var_ED']
     # str2latex(svm_cla_fea)
-    # mlp_cla_fea = ['NMED', 'RMS_RED', 'mue_ED0', 'WCE', 'mue_ARED', 'var_ED0', 'RMS_ED', 'zero-error', 'ER', 'mue_RED', 'mue_ED', 'single-sided']
+    # mlp_cla_fea = ['var_ARED', 'ER', 'RMS_ED']
     # str2latex(mlp_cla_fea)
 
-    # dt_reg_fea = ['WCE', 'mue_ARED', 'mue_ED', 'NMED', 'ER', 'mue_ED0', 'mue_RED', 'RMS_ED', 'WCRE', 'var_RED', 'var_ARED', 'var_ED0', 'zero-error']
+    # dt_reg_fea = ['mue_ED', 'RMS_RED', 'mue_ED0']
     # str2latex(dt_reg_fea)
-    # rf_reg_fea = ['var_ARED', 'RMS_ED', 'zero-error', 'mue_ED0', 'WCRE', 'var_ED0', 'RMS_RED', 'var_ED', 'var_RED', 'WCE', 'mue_ED', 'mue_ARED', 'single-sided']
+    # rf_reg_fea = ['mue_ED0', 'var_ED0', 'mue_ARED']
     # str2latex(rf_reg_fea)
-    # svm_reg_fea = ['WCE', 'var_ED', 'NMED', 'var_ARED', 'mue_ARED', 'zero-error', 'mue_ED0', 'WCRE', 'mue_ED', 'RMS_ED', 'single-sided', 'var_RED', 'RMS_RED', 'mue_RED', 'ER', 'var_ED0']
-    # str2latex(svm_reg_fea)
+    svm_reg_fea = ['WCE', 'ER', 'mue_ARED']
+    str2latex(svm_reg_fea)
     # mlp_reg_fea = ['ER', 'mue_ED0', 'zero-error', 'NMED', 'mue_ED', 'var_ARED', 'single-sided', 'var_RED', 'WCRE', 'RMS_RED', 'WCE', 'mue_ARED', 'RMS_ED', 'var_ED']
     # str2latex(mlp_reg_fea)
 
@@ -300,8 +299,9 @@ def threshold2d(df, type='retrain'):
 
 
 if __name__ == '__main__':
+    feature2latex()
     # dropRankCla()
-    dropRankReg()
+    # dropRankReg()
     # wrapperClassify()
     # wrapperRegression()
     # treeRegModel()
