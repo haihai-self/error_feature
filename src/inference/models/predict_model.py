@@ -36,6 +36,48 @@ def predictClassify(model, feature_index, model_name, df):
     y = np.array(y)
     return y, y_pre
 
+def predictClassifyZero(model, feature_index, model_name, df, type='domain'):
+    """
+    domain模型--预测分类模型对应的准确率
+    :param model: 模型
+    :param feature_index: 训练模型所用到的特征
+    :param model_name: 模型对应的名字，MLP SVM DT RF
+    :return: y y_pre(top1, top2) y_pre 为2维
+    """
+    # 读取测试文件
+    if type == 'domain':
+        all_feature = ['mue_ED0', 'mue_ED', 'ER', 'RMS_ED', 'NMED', 'var_ED0', 'var_ED',
+                    'mue_RED', 'zero-error', 'RMS_RED', 'var_RED', 'var_ARED', 'WCE', 'mue_ARED',
+                    'single-sided', 'WCRE', 'net', 'dataset', 'concat']
+    else:
+        all_feature = ['mue_ED0', 'mue_ED', 'ER', 'RMS_ED', 'NMED', 'var_ED0', 'var_ED',
+                       'mue_RED', 'zero-error', 'RMS_RED', 'var_RED', 'var_ARED', 'WCE', 'mue_ARED',
+                       'single-sided', 'WCRE']
+    x = df.loc[:, all_feature]
+    for i in range(len(all_feature)):
+        if all_feature[i] in feature_index:
+            continue
+        else:
+            x.loc[:, all_feature[i]] = 0
+
+    y = df.loc[:, 'classify']
+
+    # 计算前两类预测值
+    # x = model._validate_X_predict(x, True)
+    if model_name == 'svm':
+        proba = model.decision_function(x)
+    elif model_name == 'mlp':
+        proba = model.predict(x)
+    else:
+        proba = model.predict_proba(x)
+    top1 = np.argmax(proba, axis=1)
+    for i in range(len(proba)):
+        proba[i][top1[i]] = -1
+    top2 = np.argmax(proba, axis=1)
+    y_pre = np.stack([top1, top2], axis=1)
+    y = np.array(y)
+    return y, y_pre
+
 def predictRegression(model, feature_index, df):
     """
     domain模型--预测回归模型准确率
@@ -81,7 +123,7 @@ def plotDF(df, savename):
     :param df: DataFrame 数据结构，
     :param savename:保存pdf的文件名
     """
-    # plt.style.use(['science', 'ieee'])
+    plt.style.use(['science', 'ieee'])
     df.to_csv('../result/csv/' + savename + '.csv')
 
     for index, data in df.iteritems():
@@ -90,9 +132,48 @@ def plotDF(df, savename):
     plt.xticks(rotation=300)
 
     plt.savefig('../result/' + savename + '.pdf', bbox_inches='tight')
-    plt.show()
     plt.close()
 
+def claZeroModel(df_train, df_test, feature_rank, indexes, model):
+    """
+        构建分类误差模型
+        :param df_train: 训练数据
+        :param df_test: 测试数据
+        :param feature_index: 训练需要的特征
+        :param indexes: 需要构建的应用名称
+        :param model: 需要训练的模型
+        :param model_name: 模型的名称, svm, mlp等
+        :return:
+        """
+    fixed_feature = ['net', 'dataset', 'concat']
+    model_dict = {}
+    for i in range(len(indexes)):
+        if indexes[i] == 'domain':
+            df = processData(df_train.copy())
+            trained_model = model(df, feature_rank + fixed_feature)
+            model_dict[indexes[i]] = trained_model
+        else:
+            df = processDataSpec(df_train.loc[df_train.loc[:, 'concat'] == indexes[i], :].copy())
+            trained_model = model(df, feature_rank)
+            model_dict[indexes[i]] = trained_model
+
+    df_plot = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
+    feature_rank_len = len(feature_rank)
+    for i in range(feature_rank_len):
+        feature_index = feature_rank[0:i+1]
+        savename = 'cla_mlp_model'+str(i+1)
+        for index in indexes:
+            if index == 'domain':
+                df = processData(df_test.copy())
+                y, y_pre = predictClassifyZero(model_dict[index], feature_index + fixed_feature, 'mlp', df)
+            else:
+                df = processDataSpec(df_test.loc[df_test.loc[:, 'concat'] == index, :].copy())
+                y, y_pre = predictClassifyZero(model_dict[index], feature_index, 'mlp', df, 'spec')
+            res = classify.evaluation(y, y_pre)
+            print(res)
+            df_plot.loc[index, :] = res
+        df_plot.to_csv('../result/csv/' + savename + '.csv')
+        # plotDF(df_plot, pdf_name)
 
 def claErrorModel(df_train, df_test, feature_index, indexes,  model, model_name, df_plot, pdf_name):
     """
@@ -119,7 +200,6 @@ def claErrorModel(df_train, df_test, feature_index, indexes,  model, model_name,
             df = df_test.copy()
             df.insert(5, column='y_pre', value=y_pre[:, 0])
             df.sort_values(by=['y_pre', 'untrained_acc'], inplace=True, ascending=[True, False])
-            df.to_csv('../result/csv/'+pdf_name+'_pre.csv')
         else:
             df = processDataSpec(df_train.loc[df_train.loc[:, 'concat'] == index, :].copy())
             trained_model = model(df, feature_index)
@@ -152,7 +232,6 @@ def regErrorModel(df_train, df_test, feature_index, indexes,  model, model_name,
             df = df_test.copy()
             df.insert(0, column='y_pre', value=y_pre)
             df.sort_values(by=['classify', 'y_pre', 'untrained_acc'], inplace=True, ascending=[True, False, False])
-            df.to_csv('../result/csv/'+pdf_name+'_pre.csv')
         else:
             df = processDataSpec(df_train.loc[df_train.loc[:, 'concat'] == index, :].copy())
             trained_model = model(df, feature_index)

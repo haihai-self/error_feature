@@ -68,7 +68,9 @@ def evaluationModelRegression(feature_index, model):
     :param model:已经训练好的模型
     :return: list acc r2
     """
-    y, y_pre = predict_model.predictRegression(model, feature_index)
+    df_test = pd.read_csv('../../error/source/test_norm.csv')
+    df_test = processData(df_test)
+    y, y_pre = predict_model.predictRegression(model, feature_index, df_test)
     y = np.array(y)
     result = regression.evaluation(y, y_pre)
 
@@ -109,29 +111,32 @@ def lvmRegression(df, func):
 if __name__ == '__main__':
     df = pd.read_csv('../../error/source/train_norm.csv')
     df = processData(df)
-
-    # 分类问题模型
     func_dict = {}
+    feature = {}
+    # 分类问题模型
+
+
     # func_dict['dt'] = dt.classifyDecisionTree
     # func_dict['rf'] = rf.classifyRF
     # func_dict['svm'] = svm.classifySVM
-    func_dict['mlp'] = mlp.classifyMLP
-    feature = {}
+    # func_dict['mlp'] = mlp.classifyMLP
+    #
+    # for key in func_dict:
+    #     temp = lvmClassify(df, func_dict[key], key)
+    #     feature[key] = temp
 
-    for key in func_dict:
-        temp = lvmClassify(df, func_dict[key], key)
-        feature[key] = temp
-    print("\n\n the result of lvm: \n")
-    for key in feature:
-        print(key, ':', feature[key])
 
     # 回顾问题模型
     # func_dict = {}
     # func_dict['dt'] = dt.regressionDecisionTree
     # func_dict['svm'] = svm.regressionSVM
     # func_dict['rf'] = rf.regressionRF
-    # func_dict['mlp'] = mlp.regressionMLP
+    func_dict['mlp'] = mlp.regressionMLP
 
-    # for key in func_dict:
-    #     feature = lvmRegression(df, func_dict[key])
-    #     print(feature)
+    for key in func_dict:
+        temp = lvmRegression(df, func_dict[key])
+        feature[key] = temp
+
+    print("\n\n the result of lvm: \n")
+    for key in feature:
+        print(key, ':', feature[key])
