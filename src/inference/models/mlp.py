@@ -30,9 +30,9 @@ def classifyMLP(df, feature_sel):
         keras.layers.Dropout(0.5),
         keras.layers.Dense(256, activation='relu', dtype=tf.float32),
 
-        # keras.layers.Dropout(0.5),
-        # keras.layers.Dense(128, activation='relu', dtype=tf.float32),
-        # keras.layers.Dropout(0.5),
+        keras.layers.Dropout(0.5),
+        keras.layers.Dense(128, activation='relu', dtype=tf.float32),
+        keras.layers.Dropout(0.5),
 
         keras.layers.Dense(3, activation='softmax')
     ])
@@ -45,7 +45,7 @@ def classifyMLP(df, feature_sel):
         loss=keras.losses.SparseCategoricalCrossentropy(from_logits=False),
         optimizer=keras.optimizers.Adam(1e-3),
         metrics=['accuracy', keras.metrics.SparseCategoricalCrossentropy(from_logits=False)])
-    model.fit(train_dataset, epochs=100, verbose=2)
+    model.fit(train_dataset, epochs=200, verbose=2)
     return model
 
 
@@ -65,9 +65,9 @@ def regressionMLP(df, feature_sel):
     model = keras.Sequential([
         keras.layers.Dense(128, activation='relu', dtype=tf.float32),
         keras.layers.Dense(256, activation='relu', dtype=tf.float32),
-        # keras.layers.Dense(512, activation='relu', dtype=tf.float32),
-        # keras.layers.Dense(1024, activation='relu', dtype=tf.float32),
-        # keras.layers.Dense(128, activation='relu', dtype=tf.float32),
+        keras.layers.Dense(512, activation='relu', dtype=tf.float32),
+        keras.layers.Dense(1024, activation='relu', dtype=tf.float32),
+        keras.layers.Dense(128, activation='relu', dtype=tf.float32),
         keras.layers.Dense(1, activation=keras.activations.sigmoid)
     ])
     model.compile(
@@ -104,44 +104,15 @@ def mlpClaZeroout():
     predict_model.claZeroModel(df_train, df_test, feature_rank, indexes, classifyMLP)
 
 
-def exClaRetrain():
-    df_lists = []
-    feature_len = 17
-    data_path = '../result/csv_zero/'
-    for i in range(1, feature_len):
-        df = pd.read_csv(data_path + 'cla_mlp_model' + str(i) + '.csv')
-        df_lists.append(df)
-    graph_names = ['top-1', 'top-2', 'recall-1', 'macro-tpr', 'weight-tpr']
-    y_labels = ['AC(top-1)', 'AC(top-2)', 'recall-1', 'macro-tpr', 'weight-tpr']
-    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar','resnet18cifar',
-               'resnet34cifar', 'resnet34cifar100']
-    line = ['-', '--', ':', '-.', '--', ':', '-.', '--']
-    color = ['k', 'b', 'b', 'b', 'g', 'g', 'g', 'r']
-    for j in range(len(graph_names)):
-        name = graph_names[j]
-        df_plot = pd.DataFrame(index=indexes)
-        for i in range(len(df_lists)):
-            insert_col = df_lists[i].loc[:, name]
-            df_plot[str(i+1)] = insert_col.values
-        plt.style.use(['science', 'ieee'])
-        count = 0
-        for index, row in df_plot.iterrows():
-            plt.plot(row.index, row, color=color[count], linestyle=line[count])
-            count+=1
 
-        plt.xlabel('number of error features')
-        plt.ylabel(y_labels[j])
-        plt.savefig(data_path + name + '_zero.pdf', bbox_inches='tight')
-        plt.show()
-        plt.close()
 
 def mlpRegRetrain():
     df_train = pd.read_csv('../../error/source/train_norm.csv')
     df_test = pd.read_csv('../../error/source/test_norm.csv')
-    feature_rank = ['mue_ED0', 'mue_ED', 'ER', 'RMS_ED', 'var_ED0', 'var_ED', 'zero_error',
+    feature_rank = ['mue_ED0', 'mue_ED', 'ER', 'RMS_ED', 'var_ED0', 'var_ED', 'zero-error',
        'WCE', 'RMS_RED', 'mue_ARED', 'var_ARED', 'var_RED', 'mue_RED', 'NMED',
-       'single_side', 'WCRE']
-    for i in range(1, len(feature_rank) + 1):
+       'single-sided', 'WCRE']
+    for i in range(15, len(feature_rank) + 1):
         feature_index = feature_rank[0:i]
         indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
                    'resnet34cifar', 'resnet34cifar100']
@@ -199,10 +170,10 @@ def getlegend():
 
 
 if __name__ == '__main__':
-    getlegend()
+    # getlegend()
     # mlpClaRetrain()
     # exClaRetrain()
-    # mlpRegRetrain()
+    mlpRegRetrain()
     # buildErrorModel()
     # mlpClaZeroout()
     # mlpClaErrorModel()

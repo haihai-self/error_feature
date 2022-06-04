@@ -46,13 +46,13 @@ def buildErrorModel():
 
     # 构建分类误差模型
     feature_index = ['WCRE', 'WCE', 'mue_ED0']
-    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist',  'resnet18cifar', 'vgg16cifar',
+    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
                'resnet34cifar', 'resnet34cifar100']
     dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
     predict_model.claErrorModel(df_train, df_test, feature_index, indexes, classifyDecisionTree, 'dt', dt_df, 'cla_dt_model')
 
     # 构建回归误差模型
-    feature_index = ['var_ED', 'var_RED', 'mue_RED']
+    feature_index = ['mue_ED', 'RMS_RED', 'mue_ED0']
     dt_df = pd.DataFrame(index=indexes, columns=['MAPE', r'$\chi^2$'])
     predict_model.regErrorModel(df_train, df_test, feature_index, indexes, regressionDecisionTree, 'dt', dt_df, 'reg_dt_model')
 

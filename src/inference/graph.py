@@ -22,7 +22,7 @@ def feature2latex():
     # str2latex(rf_reg_fea)
     svm_reg_fea = ['WCE', 'ER', 'mue_ARED']
     str2latex(svm_reg_fea)
-    # mlp_reg_fea = ['ER', 'mue_ED0', 'zero-error', 'NMED', 'mue_ED', 'var_ARED', 'single-sided', 'var_RED', 'WCRE', 'RMS_RED', 'WCE', 'mue_ARED', 'RMS_ED', 'var_ED']
+    # mlp_reg_fea = ['var_RED', 'mue_ED', 'mue_ED0']
     # str2latex(mlp_reg_fea)
 
 
@@ -69,7 +69,7 @@ def wrapperRegression():
     data = [[8.688135868367432, 93.3001955340236],  # 'mue_ED', 'RMS_RED', 'mue_ED0'
             [9.38124806487342, 94.87308612377005], #'mue_ED0', 'var_ED0', 'mue_ARED'
             [115.91031982908446, 76.07126594479092], # 'WCE', 'ER', 'mue_ARED'
-            [0.06844977317607073, 0.9235117926731133]]
+            [10.552250338417672, 87.33803197048786]] # 'var_RED', 'mue_ED', 'mue_ED0'
     data = np.array(data)
     columns = ['mape', r'$R^2$']
     index = ['DT', 'RF', 'SVM', 'MLP']
@@ -171,10 +171,10 @@ def dropRankReg():
 
 def treeRegModel():
     # 绘制树模型回归指标
-    df_dt = pd.read_csv('result/csv/reg_dt_model.csv', index_col=0)
+    df_dt = pd.read_csv('inference/result/error_model/reg_dt_model.csv', index_col=0)
     df_dt = df_dt.rename(columns={'MAPE': r'$\text{MAPE}_{dt}$',
                                   r'$\chi^2$': r'$R^2_{dt}$'})
-    df_rf = pd.read_csv('result/csv/reg_rf_model.csv', index_col=0)
+    df_rf = pd.read_csv('inference/result/error_model/reg_rf_model.csv', index_col=0)
     df_rf = df_rf.rename(columns={'MAPE': r'$\text{MAPE}_{rf}$',
                                   r'$\chi^2$': r'$R^2_{rf}$'})
     plt.style.use(['science', 'ieee'])
@@ -298,8 +298,172 @@ def threshold2d(df, type='retrain'):
     plt.close()
 
 
+def cla_mlp_retrain():
+    """
+
+    :return:
+    """
+    names = []
+    names.append('cla_mlp_sel')
+    names.append('cla_dt_sel')
+    names.append('cla_rf_sel')
+    names.append('cla_svm_sel')
+    for name in names:
+        file_path = 'result/cla_evaluation_feature_sel/' + name + '.csv'
+        save_path = 'result/cla_evaluation_feature_sel/' + name + '.pdf'
+        plt.style.use(['science', 'ieee'])
+        df = pd.read_csv(file_path, index_col=0)
+        for index, data in df.iteritems():
+            if index == 'weight-tpr':
+                continue
+            plt.plot(df.index, data.values, label=index)
+        plt.legend(loc='best')
+        plt.xlabel('Feature selection method')
+        plt.ylabel(r'$\%$')
+        plt.savefig(save_path)
+        plt.close()
+
+def reg_mlp_zero_out():
+    names = []
+    names.append('reg_mlp_sel')
+    names.append('reg_dt_sel')
+    names.append('reg_rf_sel')
+    names.append('reg_svm_sel')
+    for name in names:
+        file_path = 'result/reg_evaluation_feature_sel/' + name + '.csv'
+        save_path = 'result/reg_evaluation_feature_sel/' + name + '.pdf'
+        plt.style.use(['science', 'ieee'])
+        df = pd.read_csv(file_path, index_col=0)
+        for index, data in df.iteritems():
+            plt.plot(df.index, data.values, label=index)
+        plt.xlabel('Feature selection method')
+        plt.ylabel(r'$\%$')
+        plt.legend(loc='best')
+        plt.savefig(save_path)
+        plt.close()
+
+def cla_model_mlp_retrain():
+    df_lists = []
+    feature_len = 17
+    data_path = 'result/feature_sel_res/'
+    for i in range(1, feature_len):
+        df = pd.read_csv(data_path + 'cla_mlp_model' + str(i) + '.csv')
+        df_lists.append(df)
+    graph_names = ['top-1', 'top-2', 'recall-1', 'macro-tpr', 'weight-tpr']
+    y_labels = ['top-1', 'top-2', 'recall-1', 'macro-tpr', 'weight-tpr']
+    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar','resnet18cifar',
+               'resnet34cifar', 'resnet34cifar100']
+    line = ['-', '--', ':', '-.', '--', ':', '-.', '--']
+    color = ['k', 'b', 'b', 'b', 'g', 'g', 'g', 'r']
+    for j in range(len(graph_names)):
+        name = graph_names[j]
+        df_plot = pd.DataFrame(index=indexes)
+        for i in range(len(df_lists)):
+            insert_col = df_lists[i].loc[:, name]
+            df_plot[str(i+1)] = insert_col.values
+        plt.style.use(['science', 'ieee'])
+        count = 0
+        for index, row in df_plot.iterrows():
+            plt.plot(row.index, row, color=color[count], linestyle=line[count])
+            count+=1
+
+        plt.xlabel('number of error features')
+        plt.ylabel(y_labels[j])
+        plt.savefig(data_path + name + '.pdf', bbox_inches='tight')
+        plt.show()
+        plt.close()
+
+def reg_model_mlp_retrain():
+    df_lists = []
+    feature_len = 17
+    data_path = 'result/feature_sel_res/'
+    for i in range(1, feature_len):
+        df = pd.read_csv(data_path + 'reg_mlp_model' + str(i) + '.csv')
+        df_lists.append(df)
+    graph_names = ['MAPE', r'$\chi^2$']
+    y_label = ['MAPE', r'$R^2$']
+    save_name = ['MAPE', 'R2']
+    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar','resnet18cifar',
+               'resnet34cifar', 'resnet34cifar100']
+    line = ['-', '--', ':', '-.', '--', ':', '-.', '--']
+    color = ['k', 'b', 'b', 'b', 'g', 'g', 'g', 'r']
+    for j in range(len(graph_names)):
+        name = graph_names[j]
+        df_plot = pd.DataFrame(index=indexes)
+        for i in range(len(df_lists)):
+            insert_col = df_lists[i].loc[:, name]
+            df_plot[str(i+1)] = insert_col.values
+        plt.style.use(['science', 'ieee'])
+        count = 0
+        for index, row in df_plot.iterrows():
+            plt.plot(row.index, row, color=color[count], linestyle=line[count], label=index)
+            count+=1
+        plt.legend(loc='best')
+        plt.xlabel('number of error features')
+        plt.ylabel(y_label[j] + r'($\%$)')
+        plt.savefig(data_path + save_name[j] + '.pdf', bbox_inches='tight')
+        plt.show()
+        plt.close()
+
+
+def cla_error_model():
+    model_names = ['dt', 'rf', 'mlp', 'svm']
+    df_lists = []
+    for name in model_names:
+        df = pd.read_csv('./result/error_model/cla_' + name + '_model.csv', index_col=0)
+        df_lists.append(df)
+    graph_names = ['top-1', 'top-2', 'recall-1', 'macro-tpr', 'weight-tpr']
+    y_labels = ['top-1', 'top-2', 'recall-1', 'macro-tpr', 'weight-tpr']
+    for i in range(len(graph_names)):
+        name = graph_names[i]
+        df_plot = pd.DataFrame(index=df_lists[0].index)
+        for j in range(len(df_lists)):
+            insert_col = df_lists[j].loc[:, name]
+            df_plot[model_names[j]] = insert_col.values
+        plt.style.use(['science', 'ieee'])
+        for index, data in df_plot.iteritems():
+            plt.plot(df_plot.index, data.values, label=index)
+        plt.legend(loc='best')
+        plt.xticks(rotation=300)
+        plt.ylabel(y_labels[i] + r'($\%$)')
+        plt.savefig('./result/error_model/cla_' + name + '_model.pdf', bbox_inches='tight')
+        plt.show()
+        plt.close()
+def reg_error_model():
+    model_names = ['dt', 'rf', 'mlp']
+    df_lists = []
+    for name in model_names:
+        df = pd.read_csv('./result/error_model/reg_' + name + '_model.csv', index_col=0)
+        df_lists.append(df)
+    y_labels = ['MAPE', r'$R^2$']
+    col_name = ['MAPE', r'$\chi^2$']
+    graph_names = ['MAPE', 'R2']
+    for i in range(len(graph_names)):
+        name = col_name[i]
+
+        df_plot = pd.DataFrame(index=df_lists[0].index)
+        for j in range(len(df_lists)):
+            insert_col = df_lists[j].loc[:, name]
+            df_plot[model_names[j]] = insert_col.values
+        plt.style.use(['science', 'ieee'])
+        for index, data in df_plot.iteritems():
+            plt.plot(df_plot.index, data.values, label=index)
+        plt.legend(loc='best')
+        plt.xticks(rotation=300)
+        plt.ylabel(y_labels[i] + r'($\%$)')
+        plt.savefig('./result/error_model/reg_' + graph_names[i] + '_model.pdf', bbox_inches='tight')
+        plt.show()
+        plt.close()
+
+
 if __name__ == '__main__':
-    feature2latex()
+    # cla_mlp_retrain()
+    # reg_mlp_zero_out()
+    # cla_model_mlp_retrain()
+    # reg_model_mlp_retrain()
+    # cla_error_model()
+    reg_error_model()
+    # feature2latex()
     # dropRankCla()
     # dropRankReg()
     # wrapperClassify()

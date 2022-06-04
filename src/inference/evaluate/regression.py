@@ -32,30 +32,18 @@ def evaluation(y, y_pre):
 
 
 def sel_res():
-
-    res_c = {r'$\chi^2$':['mue_ED', 'NMED', 'mue_ED0'],
-             'var':['var_ED', 'var_RED', 'mue_RED'],
-             r'$mr_c$':['WCRE','WCE','mue_ED0'],
-             r'$mr_{Dd}$':['single-sided', 'ER', 'zero-error'],
-             r'$mr_{Dq}$':['zero-error', 'single-sided', 'WCRE'],
-             r'$l_{svm}$':['var_ED', 'ER', 'WCE', 'WCRE', 'mue_RED', 'RMS_ED', 'RMS_RED', 'mue_ARED', 'single-sided', 'mue_ED', 'var_ARED', 'mue_ED0', 'var_RED'],
-             r'$l_{dt}$':['var_RED', 'single-sided', 'var_ARED', 'mue_ED0', 'ER', 'mue_ARED', 'mue_RED', 'var_ED', 'RMS_ED', 'NMED', 'WCE'],
-             r'$l_{rf}$':['var_ED0', 'WCE', 'mue_ED0', 'var_RED', 'RMS_RED'],
-             r'$l_{mlp}$':['NMED', 'RMS_RED', 'mue_ED0', 'WCE', 'mue_ARED', 'var_ED0', 'RMS_ED', 'zero-error', 'ER', 'mue_RED', 'mue_ED', 'single-sided'],
-             'dfr':['mue_ED0', 'mue_ED', 'ER']
-             }
     res_r = {r'$\chi^2$':['mue_ED', 'NMED', 'mue_ED0'],
-             r'$\sigma^2$':['mue_ED0', 'mue_ED', 'ER'],
+             r'$\sigma^2$':['var_ED', 'var_RED', 'mue_RED'],
              r'$mr_c$':['WCRE','WCE','mue_ED0'],
              r'$mr_{Dd}$':['single-sided', 'ER', 'zero-error'],
              r'$mr_{Dq}$':['zero-error', 'single-sided', 'WCRE'],
-             r'$l_{svm}$':['WCE', 'var_ED', 'NMED', 'var_ARED', 'mue_ARED', 'zero-error', 'mue_ED0', 'WCRE', 'mue_ED', 'RMS_ED', 'single-sided', 'var_RED', 'RMS_RED', 'mue_RED', 'ER', 'var_ED0'],
-             r'$l_{dt}$':['WCE', 'mue_ARED', 'mue_ED', 'NMED', 'ER', 'mue_ED0', 'mue_RED', 'RMS_ED', 'WCRE', 'var_RED', 'var_ARED', 'var_ED0', 'zero-error'],
-             r'$l_{rf}$':['var_ARED', 'RMS_ED', 'zero-error', 'mue_ED0', 'WCRE', 'var_ED0', 'RMS_RED', 'var_ED', 'var_RED', 'WCE', 'mue_ED', 'mue_ARED', 'single-sided'],
-             r'$l_{mlp}$':['WCE', 'var_ED', 'NMED', 'var_ARED', 'mue_ARED', 'zero-error', 'mue_ED0', 'WCRE', 'mue_ED', 'RMS_ED', 'single-sided', 'var_RED', 'RMS_RED', 'mue_RED', 'ER', 'var_ED0'],
-             'dfr':['var_ED', 'var_RED', 'mue_RED']
+             r'$l_{svm}$':['WCE', 'ER', 'mue_ARED'],
+             r'$l_{dt}$':['mue_ED0', 'mue_ED', 'ER'],
+             r'$l_{rf}$':['mue_ED0', 'var_ED0', 'mue_ARED'],
+             r'$l_{mlp}$':['var_RED', 'mue_ED', 'mue_ED0'],
+             'dfr': ['mue_ED', 'RMS_RED', 'mue_ED0']
              }
-    return res_c, res_r
+    return res_r
 
 def regressionDraw(df, savename):
     """
@@ -72,25 +60,28 @@ def regressionDraw(df, savename):
         plt.plot(df.index, data.values, label=index)
     # plt.legend(label)
     plt.legend(loc='best')
-    plt.savefig('../result/' + savename, bbox_inches='tight')
+    plt.savefig('../result/reg_evaluation_feature_sel/reg_' + savename + '_sel.pdf', bbox_inches='tight')
+    df.to_csv('../result/reg_evaluation_feature_sel/reg_' + savename + '_sel.csv')
     plt.show()
 
 
-def evaluationModelRegression(feature_index, model, test_or_val):
+def evaluationModelRegression(feature_index, model):
     """
     模型预测以及评价
     :param feature_index: 模型训练的特征
     :param model: 训练好的模型
     :return: 回归模型评测指标
     """
-    y, y_pre = predict_model.predictRegression(model, feature_index, test_or_val)
+    df_test = pd.read_csv('../../error/source/test_norm.csv')
+    df_test = processData(df_test.copy())
+    y, y_pre = predict_model.predictRegression(model, feature_index, df_test)
     y = np.array(y)
     result = evaluation(y, y_pre)
 
     return result
 
 if __name__ == '__main__':
-    res_c, res_r = sel_res()
+    res_r = sel_res()
     df = pd.read_csv('../../error/source/train_norm.csv')
     dt_df = pd.DataFrame(index=res_r.keys(), columns=['MAPE', r'$R^2$'])
     svm_df = pd.DataFrame(index=res_r.keys(), columns=['MAPE', r'$R^2$'])
@@ -121,11 +112,11 @@ if __name__ == '__main__':
 
         for func in func_dict:
             model = func_dict[func](df, feature_sel + fixed_feature)
-            acc = evaluationModelRegression(feature_sel + fixed_feature, model, True)
+            acc = evaluationModelRegression(feature_sel + fixed_feature, model)
             df_dict[func].loc[key, :] = acc
 
     # print(df_dict)
 
     for key in func_dict:
-        regressionDraw(df_dict[key], 'reg_' + key+'_sel_reg.pdf')
+        regressionDraw(df_dict[key], key)
     # regressionDraw(dt_df, 'reg_dt' + '_sel_reg.pdf')

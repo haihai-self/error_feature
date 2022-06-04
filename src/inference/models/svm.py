@@ -153,7 +153,7 @@ def buildErrorModel():
 
     # 构建分类误差模型
     feature_index = ['mue_ED0', 'mue_ED', 'ER']
-    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist',  'resnet18cifar', 'vgg16cifar',
+    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
                'resnet34cifar', 'resnet34cifar100']
     dt_df = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
     predict_model.claErrorModel(df_train, df_test, feature_index, indexes, classifySVM, 'svm', dt_df, 'cla_svm_model')
