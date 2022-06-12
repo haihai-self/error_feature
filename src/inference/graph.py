@@ -118,6 +118,7 @@ def dropRankCla():
                  'single': r'$E_{ss}$', 'zero': r'$E_{zo}$'
                  })
     df_plot = df_plot.T
+    df_plot.sort_values(by=0, ascending=False, inplace=True, axis=0)
     plt.figure(figsize=(9, 5))
     count = 0
     plt.style.use('science')
@@ -128,7 +129,9 @@ def dropRankCla():
         if count == 10:
             break
 
-    plt.title('DropRank classify')
+    # plt.title('DropRank classify')
+    plt.ylabel(r'keep rate($\%$)')
+
     # plt.legend(loc='lower left')
     plt.savefig('result/drop_rank_cla.pdf', bbox_inches='tight')
     # plt.show()
@@ -162,7 +165,9 @@ def dropRankReg():
         if count == 10:
             break
 
-    plt.title('DropRank classify')
+    # plt.title('DropRank classify')
+    plt.ylabel(r'keep rate($\%$)')
+
     # plt.legend(loc='lower left')
     plt.savefig('result/drop_rank_reg.pdf', bbox_inches='tight')
     # plt.show()
@@ -462,10 +467,10 @@ if __name__ == '__main__':
     # cla_model_mlp_retrain()
     # reg_model_mlp_retrain()
     # cla_error_model()
-    reg_error_model()
+    # reg_error_model()
     # feature2latex()
-    # dropRankCla()
-    # dropRankReg()
+    dropRankCla()
+    dropRankReg()
     # wrapperClassify()
     # wrapperRegression()
     # treeRegModel()
