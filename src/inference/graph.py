@@ -130,7 +130,7 @@ def dropRankCla():
             break
 
     # plt.title('DropRank classify')
-    plt.ylabel(r'keep rate($\%$)')
+    plt.ylabel(r'keep rate ($\%$)')
 
     # plt.legend(loc='lower left')
     plt.savefig('result/drop_rank_cla.pdf', bbox_inches='tight')
@@ -166,7 +166,7 @@ def dropRankReg():
             break
 
     # plt.title('DropRank classify')
-    plt.ylabel(r'keep rate($\%$)')
+    plt.ylabel(r'keep rate ($\%$)')
 
     # plt.legend(loc='lower left')
     plt.savefig('result/drop_rank_reg.pdf', bbox_inches='tight')
@@ -462,15 +462,15 @@ def reg_error_model():
 
 
 if __name__ == '__main__':
-    # cla_mlp_retrain()
+    cla_mlp_retrain()
     # reg_mlp_zero_out()
     # cla_model_mlp_retrain()
     # reg_model_mlp_retrain()
     # cla_error_model()
     # reg_error_model()
     # feature2latex()
-    dropRankCla()
-    dropRankReg()
+    # dropRankCla()
+    # dropRankReg()
     # wrapperClassify()
     # wrapperRegression()
     # treeRegModel()

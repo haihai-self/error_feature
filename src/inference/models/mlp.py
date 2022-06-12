@@ -157,7 +157,7 @@ def getlegend():
     f = lambda m, c: plt.plot([], [], linestyle=m, color=c)[0]
     handles = [f(line[i], colors[i]) for i in range(8)]
     labels = indexes
-    legend = plt.legend(handles, labels, ncol=10, framealpha=1, frameon=False, bbox_to_anchor=(0, -2))
+    legend = plt.legend(handles, labels, ncol=4, framealpha=1, frameon=False, bbox_to_anchor=(0, -2))
 
     def export_legend(legend, filename="legend.pdf"):
         fig = legend.figure
@@ -170,10 +170,10 @@ def getlegend():
 
 
 if __name__ == '__main__':
-    # getlegend()
+    getlegend()
     # mlpClaRetrain()
     # exClaRetrain()
-    mlpRegRetrain()
+    # mlpRegRetrain()
     # buildErrorModel()
     # mlpClaZeroout()
     # mlpClaErrorModel()
