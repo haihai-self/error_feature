@@ -303,7 +303,7 @@ def threshold2d(df, type='retrain'):
     plt.close()
 
 
-def cla_mlp_retrain():
+def cla_feature_sel():
     """
 
     :return:
@@ -322,13 +322,13 @@ def cla_mlp_retrain():
             if index == 'weight-tpr':
                 continue
             plt.plot(df.index, data.values, label=index)
-        plt.legend(loc='best')
+        plt.legend(loc='lower left')
         plt.xlabel('Feature selection method')
-        plt.ylabel(r'$\%$')
+        plt.ylabel(r'accuracy ($\%$)')
         plt.savefig(save_path)
         plt.close()
 
-def reg_mlp_zero_out():
+def reg_feature_sel():
     names = []
     names.append('reg_mlp_sel')
     names.append('reg_dt_sel')
@@ -342,8 +342,8 @@ def reg_mlp_zero_out():
         for index, data in df.iteritems():
             plt.plot(df.index, data.values, label=index)
         plt.xlabel('Feature selection method')
-        plt.ylabel(r'$\%$')
-        plt.legend(loc='best')
+        plt.ylabel(r'accuracy ($\%$)')
+        plt.legend(loc='lower left')
         plt.savefig(save_path)
         plt.close()
 
@@ -373,7 +373,7 @@ def cla_model_mlp_retrain():
             count+=1
 
         plt.xlabel('number of error features')
-        plt.ylabel(y_labels[j])
+        plt.ylabel(y_labels[j] + r' ($\%$)')
         plt.savefig(data_path + name + '.pdf', bbox_inches='tight')
         plt.show()
         plt.close()
@@ -388,8 +388,8 @@ def reg_model_mlp_retrain():
     graph_names = ['MAPE', r'$\chi^2$']
     y_label = ['MAPE', r'$R^2$']
     save_name = ['MAPE', 'R2']
-    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar','resnet18cifar',
-               'resnet34cifar', 'resnet34cifar100']
+    indexes = ['domain', 'vgg16-mnist', 'resnet18-mnist', 'resnet34-mnist', 'vgg16-cifar10','resnet18-cifar10',
+               'resnet34-cifar10', 'resnet34-cifar100']
     line = ['-', '--', ':', '-.', '--', ':', '-.', '--']
     color = ['k', 'b', 'b', 'b', 'g', 'g', 'g', 'r']
     for j in range(len(graph_names)):
@@ -403,9 +403,9 @@ def reg_model_mlp_retrain():
         for index, row in df_plot.iterrows():
             plt.plot(row.index, row, color=color[count], linestyle=line[count], label=index)
             count+=1
-        plt.legend(loc='best')
+        # plt.legend(loc='best')
         plt.xlabel('number of error features')
-        plt.ylabel(y_label[j] + r'($\%$)')
+        plt.ylabel(y_label[j] + r' ($\%$)')
         plt.savefig(data_path + save_name[j] + '.pdf', bbox_inches='tight')
         plt.show()
         plt.close()
@@ -428,9 +428,9 @@ def cla_error_model():
         plt.style.use(['science', 'ieee'])
         for index, data in df_plot.iteritems():
             plt.plot(df_plot.index, data.values, label=index)
-        plt.legend(loc='best')
+        # plt.legend(loc='best')
         plt.xticks(rotation=300)
-        plt.ylabel(y_labels[i] + r'($\%$)')
+        plt.ylabel(y_labels[i] + r' ($\%$)')
         plt.savefig('./result/error_model/cla_' + name + '_model.pdf', bbox_inches='tight')
         plt.show()
         plt.close()
@@ -453,16 +453,18 @@ def reg_error_model():
         plt.style.use(['science', 'ieee'])
         for index, data in df_plot.iteritems():
             plt.plot(df_plot.index, data.values, label=index)
-        plt.legend(loc='best')
+        # plt.legend(loc='best')
         plt.xticks(rotation=300)
-        plt.ylabel(y_labels[i] + r'($\%$)')
+        plt.ylabel(y_labels[i] + r' ($\%$)')
         plt.savefig('./result/error_model/reg_' + graph_names[i] + '_model.pdf', bbox_inches='tight')
         plt.show()
         plt.close()
 
 
 if __name__ == '__main__':
-    cla_mlp_retrain()
+    # cla_feature_sel()
+    reg_feature_sel()
+    # cla_mlp_retrain()
     # reg_mlp_zero_out()
     # cla_model_mlp_retrain()
     # reg_model_mlp_retrain()

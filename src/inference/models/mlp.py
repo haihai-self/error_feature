@@ -150,16 +150,34 @@ def buildErrorModel():
     df_plot = pd.DataFrame(index=indexes, columns=['top-1', 'top-2', 'recall-1', 'weight-tpr', 'macro-tpr'])
 
 def getlegend():
-    indexes = ['domain', 'vgg16mnist', 'resnet18mnist', 'resnet34mnist', 'vgg16cifar', 'resnet18cifar',
-               'resnet34cifar', 'resnet34cifar100']
+    indexes = ['domain', 'vgg16-mnist', 'resnet18-mnist', 'resnet34-mnist', 'vgg16-cifar10', 'resnet18-cifar10',
+               'resnet34-cifar10', 'resnet34-cifar100']
     line = ['-', '--', ':', '-.', '--', ':', '-.', '--']
     colors = ['k', 'b', 'b', 'b', 'g', 'g', 'g', 'r']
     f = lambda m, c: plt.plot([], [], linestyle=m, color=c)[0]
     handles = [f(line[i], colors[i]) for i in range(8)]
     labels = indexes
-    legend = plt.legend(handles, labels, ncol=4, framealpha=1, frameon=False, bbox_to_anchor=(0, -2))
+    legend = plt.legend(handles, labels, ncol=8, framealpha=1, frameon=False, bbox_to_anchor=(0, -2))
 
     def export_legend(legend, filename="legend.pdf"):
+        fig = legend.figure
+        fig.canvas.draw()
+        bbox = legend.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+        fig.savefig(filename, dpi="figure", bbox_inches=bbox)
+
+    export_legend(legend)
+    plt.show()
+
+def getlegendDefault():
+    indexes = ['DT', 'RF', 'MLP', 'SVM']
+    line = ['-', '--', ':', '-.']
+    colors = ['black', 'red', 'blue', 'g']
+    f = lambda m, c: plt.plot([], [], linestyle=m, color=c)[0]
+    handles = [f(line[i], colors[i]) for i in range(4)]
+    labels = indexes
+    legend = plt.legend(handles, labels, ncol=4, framealpha=0, frameon=False, bbox_to_anchor=(0, -2))
+
+    def export_legend(legend, filename="legend_cla_model.pdf"):
         fig = legend.figure
         fig.canvas.draw()
         bbox = legend.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
@@ -171,6 +189,7 @@ def getlegend():
 
 if __name__ == '__main__':
     getlegend()
+    # getlegendDefault()
     # mlpClaRetrain()
     # exClaRetrain()
     # mlpRegRetrain()
